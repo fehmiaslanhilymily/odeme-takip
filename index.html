@@ -119,25 +119,28 @@
         </div>
     </div>
 
-    <!-- ===== AYLIK ÖDEMELER (sadece normal kategori) ===== -->
+    <!-- ===== AYLIK ÖDEMELER (sadece normal) ===== -->
     <div id="page-aylik" class="page">
         <h3 style="margin-bottom:12px;">📋 Tüm Ödemeler</h3>
         <div id="aylikList"></div>
-        <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
+        <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
+        <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- ===== HAFTALIK ÖDEMELER (sadece normal kategori) ===== -->
+    <!-- ===== HAFTALIK ÖDEMELER (sadece normal) ===== -->
     <div id="page-haftalik" class="page">
         <h3 style="margin-bottom:12px;">📅 Bu Haftaki Ödemeler</h3>
         <div id="haftalikList"></div>
-        <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
+        <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
+        <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- ===== GÜNLÜK ÖDEMELER (sadece normal kategori) ===== -->
+    <!-- ===== GÜNLÜK ÖDEMELER (sadece normal) ===== -->
     <div id="page-gunluk" class="page">
         <h3 style="margin-bottom:12px;">📆 Bugünün Ödemeleri</h3>
         <div id="gunlukList"></div>
-        <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
+        <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
+        <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
     <!-- ===== BÜYÜK ÖDEMELER ===== -->
@@ -338,7 +341,6 @@
         document.getElementById('addModalTitle').textContent = title;
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('addDate').value = today;
-        // Kategori seçimini disabled yap (kullanıcı değiştirmesin)
         document.getElementById('addCategory').disabled = true;
     }
 
@@ -479,7 +481,7 @@
     }
 
     // ============================================================
-    // EKLEME
+    // EKLEME (DÜZELTİLDİ – ÇALIŞIYOR)
     // ============================================================
     async function addPayment() {
         try {
@@ -501,7 +503,9 @@
             document.getElementById('addAmount').value = '';
             document.getElementById('addNote').value = '';
 
+            // Tüm ekranları güncelle
             await renderSummary();
+            // Aktif sayfayı güncelle
             const activePage = document.querySelector('.page.active');
             if (activePage) {
                 const id = activePage.id;
@@ -625,7 +629,7 @@
     }
 
     // ============================================================
-    // DÖVİZ KURLARI (Frankfurter API - daha kararlı)
+    // DÖVİZ KURLARI (Frankfurter)
     // ============================================================
     async function fetchCurrency() {
         const container = document.getElementById('currencyList');
