@@ -163,7 +163,7 @@
 
     <!-- ===== DÖVİZ KURLARI ===== -->
     <div id="page-currency" class="page">
-        <h3 style="margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:#6c757d;">(Frankfurter)</small></h3>
+        <h3 style="margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:#6c757d;">(Güncel)</small></h3>
         <div id="currencyList" class="currency-grid"></div>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
     </div>
@@ -247,7 +247,7 @@
 
 <script>
     // ============================================================
-    // VERİTABANI (Kesin çalışan)
+    // VERİTABANI
     // ============================================================
     const DB_NAME = 'OdemeDB';
     const STORE_NAME = 'odemeler';
@@ -273,16 +273,10 @@
         });
     }
 
-    // Veritabanını garanti açan fonksiyon
     async function getDB() {
         if (db) return db;
-        try {
-            await openDB();
-            return db;
-        } catch (e) {
-            console.error('Veritabanı açılamadı:', e);
-            throw new Error('Veritabanı açılamadı. Lütfen sayfayı yenileyin.');
-        }
+        await openDB();
+        return db;
     }
 
     async function getPayments() {
@@ -380,7 +374,7 @@
     function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
     // ============================================================
-    // ÖZET KARTLARI
+    // ÖZET KARTLARI (SADECE NORMAL KATEGORİ)
     // ============================================================
     async function renderSummary() {
         try {
@@ -391,7 +385,10 @@
 
             let todayTotal = 0, overdueTotal = 0, upcomingTotal = 0, todayPaymentsTotal = 0;
 
-            payments.forEach(p => {
+            // Sadece "normal" kategori (veya kategori boş) olanları al
+            const normalPayments = payments.filter(p => p.category === 'normal' || !p.category);
+
+            normalPayments.forEach(p => {
                 const pDate = new Date(p.date + 'T00:00:00');
                 const amount = parseFloat(p.amount) || 0;
                 if (p.paid) {
@@ -526,11 +523,10 @@
     }
 
     // ============================================================
-    // EKLEME (DÜZELTİLDİ – KESİN ÇÖZÜM)
+    // EKLEME
     // ============================================================
     async function addPayment() {
         try {
-            // Veritabanını garantile
             await getDB();
 
             const name = document.getElementById('addName').value.trim();
@@ -679,13 +675,13 @@
     }
 
     // ============================================================
-    // DÖVİZ KURLARI
+    // DÖVİZ KURLARI (exchangerate.host – daha kararlı)
     // ============================================================
     async function fetchCurrency() {
         const container = document.getElementById('currencyList');
         container.innerHTML = '<div style="text-align:center;padding:20px;">⏳ Yükleniyor...</div>';
         try {
-            const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR,GBP,CHF,JPY');
+            const res = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=TRY,EUR,GBP,CHF,JPY');
             const data = await res.json();
             if (data && data.rates) {
                 const rates = data.rates;
@@ -706,7 +702,7 @@
                 container.innerHTML = '<div class="empty">❌ Veri alınamadı</div>';
             }
         } catch (e) {
-            container.innerHTML = '<div class="empty">❌ Bağlantı hatası</div>';
+            container.innerHTML = '<div class="empty">❌ Bağlantı hatası. Lütfen daha sonra tekrar deneyin.</div>';
             console.error(e);
         }
     }
