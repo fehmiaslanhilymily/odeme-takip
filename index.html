@@ -710,61 +710,80 @@
     // ============================================================
     // DÖVİZ KURLARI (exchangerate.host)
     // ============================================================
-    async function fetchCurrency() {
-        const container = document.getElementById('currencyList');
-        container.innerHTML = '<div style="text-align:center;padding:20px;">⏳ Yükleniyor...</div>';
-        try {
-            const res = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=TRY,EUR,GBP,CHF,JPY');
-            const data = await res.json();
-            if (data && data.rates) {
-                const rates = data.rates;
-                const currencies = [
-                    { code: 'USD/TRY', rate: rates.TRY },
-                    { code: 'EUR/TRY', rate: rates.TRY / rates.EUR },
-                    { code: 'GBP/TRY', rate: rates.TRY / rates.GBP },
-                    { code: 'CHF/TRY', rate: rates.TRY / rates.CHF },
-                    { code: 'JPY/TRY', rate: rates.TRY / rates.JPY }
-                ];
-                container.innerHTML = currencies.map(c => `
-                    <div class="currency-item">
-                        <div class="code">${c.code}</div>
-                        <div class="rate">₺${c.rate.toFixed(4)}</div>
-                    </div>
-                `).join('');
-            } else {
-                container.innerHTML = '<div class="empty">❌ Veri alınamadı, manuel veri gösteriliyor</div>';
-                const fallback = [
-                    { code: 'USD/TRY', rate: 27.50 },
-                    { code: 'EUR/TRY', rate: 29.80 },
-                    { code: 'GBP/TRY', rate: 34.20 },
-                    { code: 'CHF/TRY', rate: 31.40 },
-                    { code: 'JPY/TRY', rate: 0.19 }
-                ];
-                container.innerHTML = fallback.map(c => `
-                    <div class="currency-item">
-                        <div class="code">${c.code}</div>
-                        <div class="rate">₺${c.rate.toFixed(4)}</div>
-                    </div>
-                `).join('');
-            }
-        } catch (e) {
-            container.innerHTML = '<div class="empty">❌ Bağlantı hatası, manuel veri gösteriliyor</div>';
-            console.error(e);
-            const fallback = [
-                { code: 'USD/TRY', rate: 27.50 },
-                { code: 'EUR/TRY', rate: 29.80 },
-                { code: 'GBP/TRY', rate: 34.20 },
-                { code: 'CHF/TRY', rate: 31.40 },
-                { code: 'JPY/TRY', rate: 0.19 }
+    // ============================================================
+// DÖVİZ KURLARI (Frankfurter - kararlı)
+// ============================================================
+async function fetchCurrency() {
+    const container = document.getElementById('currencyList');
+    container.innerHTML = '<div style="text-align:center;padding:20px;">⏳ Yükleniyor...</div>';
+    try {
+        // Frankfurter API (ücretsiz, günlük 1000 istek)
+        const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR,GBP,CHF,JPY');
+        if (!res.ok) throw new Error('API yanıt vermedi');
+        const data = await res.json();
+        
+        if (data && data.rates) {
+            const rates = data.rates;
+            // rates.TRY = 1 USD kaç TRY
+            // EUR/TRY = (1 USD kaç TRY) / (1 USD kaç EUR)
+            const currencies = [
+                { code: 'USD/TRY', rate: rates.TRY },
+                { code: 'EUR/TRY', rate: rates.TRY / rates.EUR },
+                { code: 'GBP/TRY', rate: rates.TRY / rates.GBP },
+                { code: 'CHF/TRY', rate: rates.TRY / rates.CHF },
+                { code: 'JPY/TRY', rate: rates.TRY / rates.JPY }
             ];
-            container.innerHTML = fallback.map(c => `
+            container.innerHTML = currencies.map(c => `
                 <div class="currency-item">
                     <div class="code">${c.code}</div>
                     <div class="rate">₺${c.rate.toFixed(4)}</div>
                 </div>
             `).join('');
+            // Başarılı olursa yedek veriyi güncelle (sonraki hatalarda kullanmak için)
+            localStorage.setItem('currencyBackup', JSON.stringify(currencies));
+        } else {
+            throw new Error('Veri formatı hatalı');
+        }
+    } catch (e) {
+        console.error('Döviz hatası:', e);
+        // Yedek veriyi dene
+        const backup = localStorage.getItem('currencyBackup');
+        if (backup) {
+            try {
+                const parsed = JSON.parse(backup);
+                container.innerHTML = parsed.map(c => `
+                    <div class="currency-item">
+                        <div class="code">${c.code}</div>
+                        <div class="rate">₺${c.rate.toFixed(4)}</div>
+                    </div>
+                `).join('');
+                container.innerHTML += '<div style="text-align:center;font-size:11px;color:#6c757d;margin-top:8px;">⚠️ Güncel olmayan veri (yedek)</div>';
+            } catch (e2) {
+                showFallback(container);
+            }
+        } else {
+            showFallback(container);
         }
     }
+}
+
+function showFallback(container) {
+    // Gerçekçi örnek veri (yaklaşık değerler)
+    const fallback = [
+        { code: 'USD/TRY', rate: 33.20 },
+        { code: 'EUR/TRY', rate: 36.10 },
+        { code: 'GBP/TRY', rate: 42.50 },
+        { code: 'CHF/TRY', rate: 37.80 },
+        { code: 'JPY/TRY', rate: 0.21 }
+    ];
+    container.innerHTML = fallback.map(c => `
+        <div class="currency-item">
+            <div class="code">${c.code}</div>
+            <div class="rate">₺${c.rate.toFixed(4)}</div>
+        </div>
+    `).join('');
+    container.innerHTML += '<div style="text-align:center;font-size:11px;color:#d62828;margin-top:8px;">❌ Güncel veri alınamadı, tahmini değerler</div>';
+}<button class="btn btn-sm btn-secondary" onclick="fetchCurrency()" style="margin-top:8px;">🔄 Kurları Yenile</button>
 
     // ============================================================
     // ARKA PLAN
