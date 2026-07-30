@@ -112,6 +112,8 @@
             <div class="menu-card" onclick="showPage('page-aylik')"><span>📋</span>Aylık</div>
             <div class="menu-card" onclick="showPage('page-haftalik')"><span>📅</span>Bu Hafta</div>
             <div class="menu-card" onclick="showPage('page-gunluk')"><span>📆</span>Bugün</div>
+            <div class="menu-card" onclick="showPage('page-odenmis')"><span>✅</span>Ödenenler</div>
+            <div class="menu-card" onclick="showPage('page-odenmemis')"><span>⏳</span>Ödenmeyenler</div>
             <div class="menu-card" onclick="showPage('page-buyuk')"><span>💰</span>Büyük</div>
             <div class="menu-card" onclick="showPage('page-diger')"><span>📌</span>Diğer</div>
             <div class="menu-card" onclick="showPage('page-currency')"><span>💱</span>Döviz</div>
@@ -121,25 +123,37 @@
 
     <!-- ===== AYLIK ÖDEMELER (sadece normal) ===== -->
     <div id="page-aylik" class="page">
-        <h3 style="margin-bottom:12px;">📋 Tüm Ödemeler</h3>
+        <h3 style="margin-bottom:12px;">📋 Tüm Normal Ödemeler</h3>
         <div id="aylikList"></div>
         <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- ===== HAFTALIK ÖDEMELER (sadece normal) ===== -->
+    <!-- ===== HAFTALIK ÖDEMELER (tüm kategoriler) ===== -->
     <div id="page-haftalik" class="page">
-        <h3 style="margin-bottom:12px;">📅 Bu Haftaki Ödemeler</h3>
+        <h3 style="margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
         <div id="haftalikList"></div>
-        <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- ===== GÜNLÜK ÖDEMELER (sadece normal) ===== -->
+    <!-- ===== GÜNLÜK ÖDEMELER (tüm kategoriler) ===== -->
     <div id="page-gunluk" class="page">
-        <h3 style="margin-bottom:12px;">📆 Bugünün Ödemeleri</h3>
+        <h3 style="margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
         <div id="gunlukList"></div>
-        <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
+        <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
+    </div>
+
+    <!-- ===== ÖDENENLER (sadece normal) ===== -->
+    <div id="page-odenmis" class="page">
+        <h3 style="margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
+        <div id="odenmisList"></div>
+        <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
+    </div>
+
+    <!-- ===== ÖDENMEYENLER (sadece normal) ===== -->
+    <div id="page-odenmemis" class="page">
+        <h3 style="margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
+        <div id="odenmemisList"></div>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
@@ -163,7 +177,7 @@
 
     <!-- ===== DÖVİZ KURLARI ===== -->
     <div id="page-currency" class="page">
-        <h3 style="margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:#6c757d;">(Güncel)</small></h3>
+        <h3 style="margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:#6c757d;">(exchangerate.host)</small></h3>
         <div id="currencyList" class="currency-grid"></div>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
     </div>
@@ -255,21 +269,15 @@
 
     function openDB() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 2);
+            const request = indexedDB.open(DB_NAME, 3);
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
                 if (!db.objectStoreNames.contains(STORE_NAME)) {
                     db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
                 }
             };
-            request.onsuccess = (e) => {
-                db = e.target.result;
-                resolve(db);
-            };
-            request.onerror = (e) => {
-                console.error('IndexedDB hatası:', e);
-                reject(e);
-            };
+            request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+            request.onerror = (e) => reject(e);
         });
     }
 
@@ -342,6 +350,8 @@
         if (id === 'page-aylik') renderAylik();
         else if (id === 'page-haftalik') renderHaftalik();
         else if (id === 'page-gunluk') renderGunluk();
+        else if (id === 'page-odenmis') renderOdenenler();
+        else if (id === 'page-odenmemis') renderOdenmeyenler();
         else if (id === 'page-buyuk') renderBuyuk();
         else if (id === 'page-diger') renderDiger();
         else if (id === 'page-currency') fetchCurrency();
@@ -374,7 +384,7 @@
     function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
     // ============================================================
-    // ÖZET KARTLARI (SADECE NORMAL KATEGORİ)
+    // ÖZET KARTLARI (Sadece normal kategori)
     // ============================================================
     async function renderSummary() {
         try {
@@ -385,7 +395,7 @@
 
             let todayTotal = 0, overdueTotal = 0, upcomingTotal = 0, todayPaymentsTotal = 0;
 
-            // Sadece "normal" kategori (veya kategori boş) olanları al
+            // Sadece normal kategoridekileri al
             const normalPayments = payments.filter(p => p.category === 'normal' || !p.category);
 
             normalPayments.forEach(p => {
@@ -407,7 +417,7 @@
             document.getElementById('upcomingTotal').textContent = '₺' + upcomingTotal.toFixed(2);
             document.getElementById('todayPaymentsTotal').textContent = '₺' + todayPaymentsTotal.toFixed(2);
         } catch (e) {
-            showToast('❌ Veriler yüklenirken hata: ' + e.message);
+            showToast('❌ Özet yüklenirken hata: ' + e.message);
         }
     }
 
@@ -447,12 +457,10 @@
             const container = document.getElementById('aylikList');
             if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Normal ödeme yok</div>'; return; }
             container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
-        } catch (e) {
-            showToast('❌ Hata: ' + e.message);
-        }
+        } catch (e) { showToast('❌ Hata: ' + e.message); }
     }
 
-    // ---- Haftalık (sadece normal) ----
+    // ---- Haftalık (TÜM kategoriler) ----
     async function renderHaftalik() {
         try {
             const payments = await getPayments();
@@ -464,32 +472,56 @@
             const sunday = new Date(monday);
             sunday.setDate(monday.getDate() + 6);
 
+            // Tüm kategoriler
             const filtered = payments.filter(p => {
                 const pDate = new Date(p.date + 'T00:00:00');
-                return (p.category === 'normal' || !p.category) && pDate >= monday && pDate <= sunday;
+                return pDate >= monday && pDate <= sunday;
             }).sort((a,b) => new Date(a.date) - new Date(b.date));
 
             const container = document.getElementById('haftalikList');
-            if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bu hafta normal ödeme yok</div>'; return; }
+            if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bu hafta ödeme yok</div>'; return; }
             container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
-        } catch (e) {
-            showToast('❌ Hata: ' + e.message);
-        }
+        } catch (e) { showToast('❌ Hata: ' + e.message); }
     }
 
-    // ---- Günlük (sadece normal) ----
+    // ---- Günlük (TÜM kategoriler) ----
     async function renderGunluk() {
         try {
             const payments = await getPayments();
             const todayStr = new Date().toISOString().split('T')[0];
-            const filtered = payments.filter(p => (p.category === 'normal' || !p.category) && p.date === todayStr)
+            // Tüm kategoriler
+            const filtered = payments.filter(p => p.date === todayStr)
                 .sort((a,b) => new Date(a.date) - new Date(b.date));
             const container = document.getElementById('gunlukList');
-            if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bugün normal ödeme yok</div>'; return; }
+            if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bugün ödeme yok</div>'; return; }
             container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
-        } catch (e) {
-            showToast('❌ Hata: ' + e.message);
-        }
+        } catch (e) { showToast('❌ Hata: ' + e.message); }
+    }
+
+    // ---- Ödenenler (sadece normal) ----
+    async function renderOdenenler() {
+        try {
+            const payments = await getPayments();
+            const filtered = payments.filter(p => (p.category === 'normal' || !p.category) && p.paid === true)
+                .sort((a,b) => new Date(a.date) - new Date(b.date));
+            const container = document.getElementById('odenmisList');
+            if (!filtered.length) { container.innerHTML = '<div class="empty">✅ Ödenen normal ödeme yok</div>'; return; }
+            container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
+        } catch (e) { showToast('❌ Hata: ' + e.message); }
+    }
+
+    // ---- Ödenmeyenler (sadece normal, gecikmiş) ----
+    async function renderOdenmeyenler() {
+        try {
+            const payments = await getPayments();
+            const today = new Date().toISOString().split('T')[0];
+            const filtered = payments.filter(p => {
+                return (p.category === 'normal' || !p.category) && p.paid === false && p.date < today;
+            }).sort((a,b) => new Date(a.date) - new Date(b.date));
+            const container = document.getElementById('odenmemisList');
+            if (!filtered.length) { container.innerHTML = '<div class="empty">⏳ Gecikmiş normal ödeme yok</div>'; return; }
+            container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
+        } catch (e) { showToast('❌ Hata: ' + e.message); }
     }
 
     // ---- Büyük ----
@@ -502,9 +534,7 @@
             const container = document.getElementById('buyukList');
             if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Büyük ödeme yok</div>'; return; }
             container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
-        } catch (e) {
-            showToast('❌ Hata: ' + e.message);
-        }
+        } catch (e) { showToast('❌ Hata: ' + e.message); }
     }
 
     // ---- Diğer ----
@@ -517,9 +547,7 @@
             const container = document.getElementById('digerList');
             if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Diğer ödeme yok</div>'; return; }
             container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
-        } catch (e) {
-            showToast('❌ Hata: ' + e.message);
-        }
+        } catch (e) { showToast('❌ Hata: ' + e.message); }
     }
 
     // ============================================================
@@ -528,7 +556,6 @@
     async function addPayment() {
         try {
             await getDB();
-
             const name = document.getElementById('addName').value.trim();
             const amount = parseFloat(document.getElementById('addAmount').value);
             const date = document.getElementById('addDate').value;
@@ -554,11 +581,13 @@
                 if (id === 'page-aylik') await renderAylik();
                 else if (id === 'page-haftalik') await renderHaftalik();
                 else if (id === 'page-gunluk') await renderGunluk();
+                else if (id === 'page-odenmis') await renderOdenenler();
+                else if (id === 'page-odenmemis') await renderOdenmeyenler();
                 else if (id === 'page-buyuk') await renderBuyuk();
                 else if (id === 'page-diger') await renderDiger();
             }
         } catch (e) {
-            console.error('Hata:', e);
+            console.error(e);
             showToast('❌ Hata: ' + e.message);
         }
     }
@@ -581,6 +610,8 @@
                 if (id === 'page-aylik') await renderAylik();
                 else if (id === 'page-haftalik') await renderHaftalik();
                 else if (id === 'page-gunluk') await renderGunluk();
+                else if (id === 'page-odenmis') await renderOdenenler();
+                else if (id === 'page-odenmemis') await renderOdenmeyenler();
                 else if (id === 'page-buyuk') await renderBuyuk();
                 else if (id === 'page-diger') await renderDiger();
             }
@@ -608,9 +639,7 @@
             document.getElementById('editCategory').value = p.category || 'normal';
             document.getElementById('editNote').value = p.note || '';
             document.getElementById('editModal').classList.add('active');
-        } catch (e) {
-            showToast('❌ Hata: ' + e.message);
-        }
+        } catch (e) { showToast('❌ Hata: ' + e.message); }
     }
 
     async function saveEditPayment() {
@@ -641,6 +670,8 @@
                 if (id === 'page-aylik') await renderAylik();
                 else if (id === 'page-haftalik') await renderHaftalik();
                 else if (id === 'page-gunluk') await renderGunluk();
+                else if (id === 'page-odenmis') await renderOdenenler();
+                else if (id === 'page-odenmemis') await renderOdenmeyenler();
                 else if (id === 'page-buyuk') await renderBuyuk();
                 else if (id === 'page-diger') await renderDiger();
             }
@@ -665,6 +696,8 @@
                 if (id === 'page-aylik') await renderAylik();
                 else if (id === 'page-haftalik') await renderHaftalik();
                 else if (id === 'page-gunluk') await renderGunluk();
+                else if (id === 'page-odenmis') await renderOdenenler();
+                else if (id === 'page-odenmemis') await renderOdenmeyenler();
                 else if (id === 'page-buyuk') await renderBuyuk();
                 else if (id === 'page-diger') await renderDiger();
             }
@@ -675,7 +708,7 @@
     }
 
     // ============================================================
-    // DÖVİZ KURLARI (exchangerate.host – daha kararlı)
+    // DÖVİZ KURLARI (exchangerate.host)
     // ============================================================
     async function fetchCurrency() {
         const container = document.getElementById('currencyList');
@@ -699,11 +732,37 @@
                     </div>
                 `).join('');
             } else {
-                container.innerHTML = '<div class="empty">❌ Veri alınamadı</div>';
+                container.innerHTML = '<div class="empty">❌ Veri alınamadı, manuel veri gösteriliyor</div>';
+                const fallback = [
+                    { code: 'USD/TRY', rate: 27.50 },
+                    { code: 'EUR/TRY', rate: 29.80 },
+                    { code: 'GBP/TRY', rate: 34.20 },
+                    { code: 'CHF/TRY', rate: 31.40 },
+                    { code: 'JPY/TRY', rate: 0.19 }
+                ];
+                container.innerHTML = fallback.map(c => `
+                    <div class="currency-item">
+                        <div class="code">${c.code}</div>
+                        <div class="rate">₺${c.rate.toFixed(4)}</div>
+                    </div>
+                `).join('');
             }
         } catch (e) {
-            container.innerHTML = '<div class="empty">❌ Bağlantı hatası. Lütfen daha sonra tekrar deneyin.</div>';
+            container.innerHTML = '<div class="empty">❌ Bağlantı hatası, manuel veri gösteriliyor</div>';
             console.error(e);
+            const fallback = [
+                { code: 'USD/TRY', rate: 27.50 },
+                { code: 'EUR/TRY', rate: 29.80 },
+                { code: 'GBP/TRY', rate: 34.20 },
+                { code: 'CHF/TRY', rate: 31.40 },
+                { code: 'JPY/TRY', rate: 0.19 }
+            ];
+            container.innerHTML = fallback.map(c => `
+                <div class="currency-item">
+                    <div class="code">${c.code}</div>
+                    <div class="rate">₺${c.rate.toFixed(4)}</div>
+                </div>
+            `).join('');
         }
     }
 
@@ -772,7 +831,7 @@
             }
             await renderSummary();
         } catch (e) {
-            console.error('Başlangıç hatası:', e);
+            console.error(e);
             showToast('❌ Uygulama başlatılamadı: ' + e.message);
         }
     };
