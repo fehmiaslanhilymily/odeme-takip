@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aylık Ödeme Tablosu</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f4f6f9; display: flex; justify-content: center; padding: 16px; min-height: 100vh; }
+        #app { max-width: 480px; width: 100%; background: white; border-radius: 32px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.08); min-height: 90vh; display: flex; flex-direction: column; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #eef2f6; }
+        .header h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+        .header h1 span { color: #2d6a4f; }
+        .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 4px 8px; color: #6c757d; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #2d6a4f; color: white; border: none; padding: 10px 16px; border-radius: 30px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 6px; }
+        .btn:active { transform: scale(0.96); opacity: 0.8; }
+        .btn-danger { background: #d62828; }
+        .btn-secondary { background: #457b9d; }
+        .btn-warning { background: #f4a261; color: #1a1a2e; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; width: auto; }
+        .btn-outline { background: transparent; border: 2px solid #2d6a4f; color: #2d6a4f; }
+        .page { display: none; animation: fadeUp 0.3s; }
+        .page.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Kartlar */
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .summary-card { background: #f8fafc; padding: 14px; border-radius: 16px; text-align: center; border: 1px solid #e9edf2; }
+        .summary-card .value { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-top: 2px; }
+        .summary-card .label { font-size: 12px; color: #6c757d; }
+        .summary-card .value.danger { color: #d62828; }
+        .summary-card .value.success { color: #2d6a4f; }
+
+        /* Filtreler */
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .filters select, .filters input { padding: 8px 12px; border-radius: 30px; border: 1px solid #ced4da; background: #f8f9fa; font-size: 13px; flex: 1; min-width: 80px; }
+
+        /* Liste */
+        .payment-item { background: white; border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; border: 1px solid #e9edf2; box-shadow: 0 2px 6px rgba(0,0,0,0.02); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .payment-item .info { flex: 1; min-width: 0; }
+        .payment-item .info h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .payment-item .info p { font-size: 12px; color: #6c757d; margin: 1px 0; }
+        .payment-item .info .badge { display: inline-block; padding: 2px 10px; border-radius: 30px; font-size: 10px; font-weight: 600; background: #e9edf2; }
+        .payment-item .info .badge.odendi { background: #2d6a4f; color: white; }
+        .payment-item .info .badge.gecikmis { background: #d62828; color: white; }
+        .payment-item .actions { display: flex; gap: 4px; flex-wrap: wrap; }
+        .payment-item .actions button { background: none; border: none; font-size: 18px; cursor: pointer; padding: 4px 6px; border-radius: 8px; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; max-width: 400px; width: 100%; border-radius: 28px; padding: 24px; max-height: 90vh; overflow-y: auto; }
+        .modal-box h2 { font-size: 20px; margin-bottom: 16px; }
+        .modal-box label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 4px; }
+        .modal-box input, .modal-box select, .modal-box textarea { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 12px; font-size: 14px; margin-bottom: 12px; background: #f8f9fa; }
+        .modal-box .btn-group { display: flex; gap: 10px; margin-top: 8px; }
+        .modal-box .btn-group .btn { flex: 1; }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 50px; font-size: 14px; z-index: 999; display: none; max-width: 90%; text-align: center; }
+        .toast.show { display: block; animation: toastPop 0.3s; }
+        @keyframes toastPop { from { opacity: 0; transform: translateX(-50%) scale(0.9); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+        .empty { color: #adb5bd; text-align: center; padding: 30px 0; font-size: 15px; }
+        .mt-10 { margin-top: 10px; }
+        .flex { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="header">
+        <h1>📆 <span>Ödeme</span> Tablosu</h1>
+        <button class="back-btn" id="globalBackBtn" style="display:none;" onclick="goHome()">✕</button>
+    </div>
+    <div id="toast" class="toast"></div>
+
+    <!-- ===== ANA SAYFA ===== -->
+    <div id="page-home" class="page active">
+        <!-- Özet Kartlar -->
+        <div class="summary-grid">
+            <div class="summary-card"><div class="label">Bugün Vadesi Gelen</div><div class="value danger" id="todayTotal">₺0</div></div>
+            <div class="summary-card"><div class="label">Gecikmiş Toplam</div><div class="value danger" id="overdueTotal">₺0</div></div>
+            <div class="summary-card"><div class="label">Yaklaşan Toplam</div><div class="value" id="upcomingTotal">₺0</div></div>
+            <div class="summary-card"><div class="label">Ödenen Toplam</div><div class="value success" id="paidTotal">₺0</div></div>
+        </div>
+
+        <!-- Filtreler -->
+        <div class="filters">
+            <select id="periyotFilter" onchange="renderList()">
+                <option value="all">Tüm Periyotlar</option>
+                <option value="Günlük">Günlük</option>
+                <option value="Haftalık">Haftalık</option>
+                <option value="Aylık">Aylık</option>
+            </select>
+            <select id="durumFilter" onchange="renderList()">
+                <option value="all">Tüm Durumlar</option>
+                <option value="false">Ödenmeyenler</option>
+                <option value="true">Ödenenler</option>
+            </select>
+        </div>
+
+        <!-- Liste -->
+        <div id="paymentList"></div>
+
+        <!-- Alt Menü Butonları -->
+        <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+            <button class="btn btn-sm" onclick="showAddModal()" style="flex:1;">➕ Yeni Ödeme</button>
+            <button class="btn btn-sm btn-secondary" onclick="goHome()" style="flex:1;">🔄 Yenile</button>
+        </div>
+    </div>
+
+    <!-- ===== EKLEME MODAL ===== -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-box">
+            <h2>➕ Yeni Ödeme</h2>
+            <label>Ödeme Adı</label>
+            <input type="text" id="addName" placeholder="Örn: Elektrik Faturası">
+            <label>Tutar (₺)</label>
+            <input type="number" id="addAmount" placeholder="0.00" step="0.01">
+            <label>Tarih</label>
+            <input type="date" id="addDate">
+            <label>Periyot</label>
+            <select id="addPeriod">
+                <option value="Günlük">Günlük</option>
+                <option value="Haftalık">Haftalık</option>
+                <option value="Aylık" selected>Aylık</option>
+            </select>
+            <label>Not (isteğe bağlı)</label>
+            <input type="text" id="addNote" placeholder="Örn: TEDAŞ">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeAddModal()">İptal</button>
+                <button class="btn" onclick="addPayment()">💾 Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DÜZENLEME MODAL ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h2>✏️ Ödeme Düzenle</h2>
+            <label>Ödeme Adı</label>
+            <input type="text" id="editName">
+            <label>Tutar (₺)</label>
+            <input type="number" id="editAmount" step="0.01">
+            <label>Tarih</label>
+            <input type="date" id="editDate">
+            <label>Periyot</label>
+            <select id="editPeriod">
+                <option value="Günlük">Günlük</option>
+                <option value="Haftalık">Haftalık</option>
+                <option value="Aylık">Aylık</option>
+            </select>
+            <label>Not</label>
+            <input type="text" id="editNote">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeEditModal()">İptal</button>
+                <button class="btn" onclick="saveEditPayment()">💾 Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // VERİTABANI (IndexedDB)
+    // ============================================================
+    const DB_NAME = 'OdemeDB';
+    const STORE_NAME = 'odemeler';
+    let db = null;
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                }
+            };
+            request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+            request.onerror = (e) => reject(e);
+        });
+    }
+
+    async function getPayments() {
+        return new Promise((resolve) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const result = store.getAll();
+            result.onsuccess = () => resolve(result.result);
+            result.onerror = () => resolve([]);
+        });
+    }
+
+    async function savePayment(payment) {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.add(payment);
+        await new Promise((resolve) => tx.oncomplete = resolve);
+    }
+
+    async function updatePayment(payment) {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.put(payment);
+        await new Promise((resolve) => tx.oncomplete = resolve);
+    }
+
+    async function deletePayment(id) {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.delete(id);
+        await new Promise((resolve) => tx.oncomplete = resolve);
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ============================================================
+    // SAYFA YÖNETİMİ
+    // ============================================================
+    function goHome() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-home').classList.add('active');
+        document.getElementById('globalBackBtn').style.display = 'none';
+        renderAll();
+    }
+
+    function showAddModal() {
+        document.getElementById('addModal').classList.add('active');
+        // Bugünün tarihini varsayılan yap
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('addDate').value = today;
+    }
+    function closeAddModal() { document.getElementById('addModal').classList.remove('active'); }
+    function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+
+    // ============================================================
+    // RENDER (Liste + Özet)
+    // ============================================================
+    async function renderAll() {
+        await renderSummary();
+        await renderList();
+    }
+
+    async function renderSummary() {
+        const payments = await getPayments();
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const todayStr = today.toISOString().split('T')[0];
+
+        let todayTotal = 0, overdueTotal = 0, upcomingTotal = 0, paidTotal = 0;
+
+        payments.forEach(p => {
+            const pDate = new Date(p.date + 'T00:00:00');
+            const amount = parseFloat(p.amount) || 0;
+            if (p.paid) {
+                paidTotal += amount;
+            } else {
+                if (pDate < today) overdueTotal += amount;
+                else if (pDate.getTime() === today.getTime()) todayTotal += amount;
+                else upcomingTotal += amount;
+            }
+        });
+
+        document.getElementById('todayTotal').textContent = '₺' + todayTotal.toFixed(2);
+        document.getElementById('overdueTotal').textContent = '₺' + overdueTotal.toFixed(2);
+        document.getElementById('upcomingTotal').textContent = '₺' + upcomingTotal.toFixed(2);
+        document.getElementById('paidTotal').textContent = '₺' + paidTotal.toFixed(2);
+    }
+
+    async function renderList() {
+        const payments = await getPayments();
+        const periyotFilter = document.getElementById('periyotFilter').value;
+        const durumFilter = document.getElementById('durumFilter').value;
+
+        let filtered = payments;
+        if (periyotFilter !== 'all') {
+            filtered = filtered.filter(p => p.period === periyotFilter);
+        }
+        if (durumFilter !== 'all') {
+            const paid = durumFilter === 'true';
+            filtered = filtered.filter(p => p.paid === paid);
+        }
+
+        // Tarihe göre sırala (en yakın önce)
+        filtered.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+        const container = document.getElementById('paymentList');
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty">📭 Gösterilecek ödeme yok</div>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(p => {
+            const today = new Date().toISOString().split('T')[0];
+            const isOverdue = p.date < today && !p.paid;
+            const isToday = p.date === today && !p.paid;
+            let badge = '';
+            if (p.paid) badge = '<span class="badge odendi">Ödendi</span>';
+            else if (isOverdue) badge = '<span class="badge gecikmis">Gecikmiş</span>';
+            else if (isToday) badge = '<span class="badge" style="background:#f4a261;color:#1a1a2e;">Bugün</span>';
+
+            return `
+                <div class="payment-item">
+                    <div class="info">
+                        <h4>${p.name} <span style="font-weight:700;color:#2d6a4f;">₺${parseFloat(p.amount).toFixed(2)}</span></h4>
+                        <p>📅 ${p.date} · ${p.period} ${p.note ? '· ' + p.note : ''}</p>
+                        <p>${badge}</p>
+                    </div>
+                    <div class="actions">
+                        <button onclick="togglePaid(${p.id})" title="Ödendi işaretle">${p.paid ? '✅' : '⬜'}</button>
+                        <button onclick="openEditModal(${p.id})" title="Düzenle">✏️</button>
+                        <button onclick="deleteSinglePayment(${p.id})" title="Sil">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ============================================================
+    // EKLEME
+    // ============================================================
+    async function addPayment() {
+        const name = document.getElementById('addName').value.trim();
+        const amount = parseFloat(document.getElementById('addAmount').value);
+        const date = document.getElementById('addDate').value;
+        const period = document.getElementById('addPeriod').value;
+        const note = document.getElementById('addNote').value.trim();
+
+        if (!name) { showToast('❌ Ödeme adı zorunlu'); return; }
+        if (isNaN(amount) || amount <= 0) { showToast('❌ Geçerli bir tutar girin'); return; }
+        if (!date) { showToast('❌ Tarih seçin'); return; }
+
+        await savePayment({ name, amount, date, period, note, paid: false });
+        showToast('✅ Ödeme eklendi');
+        closeAddModal();
+        document.getElementById('addName').value = '';
+        document.getElementById('addAmount').value = '';
+        document.getElementById('addNote').value = '';
+        await renderAll();
+    }
+
+    // ============================================================
+    // ÖDENDİ İŞARETLEME
+    // ============================================================
+    async function togglePaid(id) {
+        const payments = await getPayments();
+        const p = payments.find(item => item.id === id);
+        if (!p) return;
+        p.paid = !p.paid;
+        await updatePayment(p);
+        showToast(p.paid ? '✅ Ödendi olarak işaretlendi' : '↩️ Ödenmedi olarak işaretlendi');
+        await renderAll();
+    }
+
+    // ============================================================
+    // DÜZENLEME
+    // ============================================================
+    let editingId = null;
+
+    async function openEditModal(id) {
+        const payments = await getPayments();
+        const p = payments.find(item => item.id === id);
+        if (!p) return;
+        editingId = id;
+        document.getElementById('editName').value = p.name || '';
+        document.getElementById('editAmount').value = p.amount || '';
+        document.getElementById('editDate').value = p.date || '';
+        document.getElementById('editPeriod').value = p.period || 'Aylık';
+        document.getElementById('editNote').value = p.note || '';
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    async function saveEditPayment() {
+        if (!editingId) return;
+        const name = document.getElementById('editName').value.trim();
+        const amount = parseFloat(document.getElementById('editAmount').value);
+        const date = document.getElementById('editDate').value;
+        const period = document.getElementById('editPeriod').value;
+        const note = document.getElementById('editNote').value.trim();
+
+        if (!name) { showToast('❌ Ad zorunlu'); return; }
+        if (isNaN(amount) || amount <= 0) { showToast('❌ Geçerli tutar girin'); return; }
+        if (!date) { showToast('❌ Tarih seçin'); return; }
+
+        const payments = await getPayments();
+        const existing = payments.find(p => p.id === editingId);
+        if (!existing) return;
+        const updated = { ...existing, name, amount, date, period, note };
+        await updatePayment(updated);
+        showToast('✅ Ödeme güncellendi');
+        closeEditModal();
+        await renderAll();
+    }
+
+    // ============================================================
+    // SİL
+    // ============================================================
+    async function deleteSinglePayment(id) {
+        if (!confirm('Bu ödemeyi silmek istediğinize emin misiniz?')) return;
+        await deletePayment(id);
+        showToast('🗑️ Ödeme silindi');
+        await renderAll();
+    }
+
+    // ============================================================
+    // BAŞLAT
+    // ============================================================
+    window.onload = async function() {
+        await openDB();
+        // Örnek veri yoksa ekle
+        const payments = await getPayments();
+        if (payments.length === 0) {
+            const today = new Date().toISOString().split('T')[0];
+            const sample = [
+                { name: 'Elektrik Faturası', amount: 450, date: today, period: 'Aylık', note: 'TEDAŞ', paid: false },
+                { name: 'İnternet', amount: 199.90, date: today, period: 'Aylık', note: '', paid: false },
+                { name: 'Netflix', amount: 99.99, date: today, period: 'Aylık', note: 'Aile paketi', paid: false },
+                { name: 'Su Faturası', amount: 85.50, date: '2026-07-10', period: 'Aylık', note: '', paid: true },
+            ];
+            for (const item of sample) {
+                await savePayment(item);
+            }
+            showToast('📋 Örnek ödemeler eklendi');
+        }
+        await renderAll();
+    };
+</script>
+</body>
+</html>
