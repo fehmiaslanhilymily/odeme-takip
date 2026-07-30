@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aylık Ödeme Tablosu</title>
+    <title>Ödeme Takip</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        /* ===== RESET & GENEL ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
         body {
-            background: #f4f6f9;
+            background: #0a0e27;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -18,88 +19,334 @@
             transition: background 0.5s ease;
         }
         #app {
-            max-width: 480px;
+            max-width: 420px;
             width: 100%;
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 32px;
-            padding: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 20px 16px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
             min-height: 90vh;
             display: flex;
             flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.08);
         }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .header h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
-        .header h1 span { color: #2d6a4f; }
-        .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 4px 8px; color: #6c757d; }
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #2d6a4f; color: white; border: none; padding: 10px 16px; border-radius: 30px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 6px; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        .header h1 span {
+            -webkit-text-fill-color: #fff;
+            background: none;
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            font-size: 20px;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .back-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.15); }
+
+        /* ===== BUTONLAR ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #0a0e27;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 6px;
+            box-shadow: 0 4px 16px rgba(247, 151, 30, 0.25);
+        }
         .btn:active { transform: scale(0.96); opacity: 0.8; }
-        .btn-danger { background: #d62828; }
-        .btn-secondary { background: #457b9d; }
-        .btn-warning { background: #f4a261; color: #1a1a2e; }
-        .btn-sm { padding: 6px 12px; font-size: 12px; width: auto; }
-        .page { display: none; animation: fadeUp 0.3s; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            box-shadow: none;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-secondary:active { background: rgba(255,255,255,0.15); }
+        .btn-danger {
+            background: linear-gradient(135deg, #f43b47, #f77a7a);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(244, 59, 71, 0.3);
+        }
+        .btn-sm { padding: 8px 16px; font-size: 12px; width: auto; }
+
+        /* ===== KARTLAR ===== */
+        .page { display: none; animation: fadeUp 0.4s ease; }
         .page.active { display: block; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .summary-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); padding: 14px; border-radius: 16px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
-        .summary-card .value { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-top: 2px; }
-        .summary-card .label { font-size: 12px; color: #6c757d; }
-        .summary-card .value.danger { color: #d62828; }
-        .summary-card .value.success { color: #2d6a4f; }
+        /* Özet Kartları */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 16px 14px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: 0.2s;
+        }
+        .summary-card .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 4px;
+            letter-spacing: -0.3px;
+        }
+        .summary-card .label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .summary-card .value.danger { color: #ff6b6b; }
+        .summary-card .value.success { color: #69db7c; }
 
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
-        .menu-card { background: rgba(255,255,255,0.5); backdrop-filter: blur(4px); padding: 16px 8px; border-radius: 16px; text-align: center; border: 1px solid rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; }
-        .menu-card:active { transform: scale(0.94); background: rgba(255,255,255,0.8); }
-        .menu-card span { font-size: 28px; display: block; margin-bottom: 4px; }
+        /* Menü Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .menu-card {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(8px);
+            padding: 14px 6px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: rgba(255,255,255,0.7);
+        }
+        .menu-card:active { transform: scale(0.94); background: rgba(255,255,255,0.08); }
+        .menu-card span { font-size: 26px; display: block; margin-bottom: 4px; }
+        .menu-card .label { font-size: 11px; font-weight: 500; }
 
-        .payment-item { background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; border: 1px solid rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        /* Ödeme Öğeleri */
+        .payment-item {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(8px);
+            border-radius: 18px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            transition: 0.15s;
+        }
         .payment-item .info { flex: 1; min-width: 0; }
-        .payment-item .info h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
-        .payment-item .info p { font-size: 12px; color: #6c757d; margin: 1px 0; }
-        .payment-item .info .badge { display: inline-block; padding: 2px 10px; border-radius: 30px; font-size: 10px; font-weight: 600; background: rgba(0,0,0,0.05); }
-        .payment-item .info .badge.odendi { background: #2d6a4f; color: white; }
-        .payment-item .info .badge.gecikmis { background: #d62828; color: white; }
+        .payment-item .info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .payment-item .info p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin: 1px 0;
+        }
+        .payment-item .info .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 9px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.6);
+        }
+        .payment-item .info .badge.odendi { background: #2d6a4f; color: #69db7c; }
+        .payment-item .info .badge.gecikmis { background: #6b1a1a; color: #ff6b6b; }
+        .payment-item .info .badge.bugun { background: #f7971e; color: #0a0e27; }
         .payment-item .actions { display: flex; gap: 4px; flex-wrap: wrap; }
-        .payment-item .actions button { background: none; border: none; font-size: 18px; cursor: pointer; padding: 4px 6px; border-radius: 8px; }
+        .payment-item .actions button {
+            background: rgba(255,255,255,0.04);
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 30px;
+            color: rgba(255,255,255,0.5);
+            transition: 0.15s;
+        }
+        .payment-item .actions button:active { background: rgba(255,255,255,0.1); }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
         .modal-overlay.active { display: flex; }
-        .modal-box { background: white; max-width: 400px; width: 100%; border-radius: 28px; padding: 24px; max-height: 90vh; overflow-y: auto; }
-        .modal-box h2 { font-size: 20px; margin-bottom: 16px; }
-        .modal-box label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 4px; }
-        .modal-box input, .modal-box select { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 12px; font-size: 14px; margin-bottom: 12px; background: #f8f9fa; }
+        .modal-box {
+            background: #1a1e3a;
+            max-width: 380px;
+            width: 100%;
+            border-radius: 32px;
+            padding: 24px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .modal-box h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .modal-box label {
+            font-weight: 600;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .modal-box input, .modal-box select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 60px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            outline: none;
+        }
+        .modal-box input:focus, .modal-box select:focus {
+            border-color: #f7971e;
+        }
+        .modal-box input::placeholder { color: rgba(255,255,255,0.2); }
         .modal-box .btn-group { display: flex; gap: 10px; margin-top: 8px; }
         .modal-box .btn-group .btn { flex: 1; }
 
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 50px; font-size: 14px; z-index: 999; display: none; max-width: 90%; text-align: center; }
+        /* Diğer */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(12px);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-size: 13px;
+            z-index: 999;
+            display: none;
+            max-width: 90%;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
         .toast.show { display: block; animation: toastPop 0.3s; }
         @keyframes toastPop { from { opacity: 0; transform: translateX(-50%) scale(0.9); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
-        .empty { color: #adb5bd; text-align: center; padding: 30px 0; font-size: 15px; }
-        .total-box { background: rgba(255,255,255,0.5); backdrop-filter: blur(4px); padding: 12px 16px; border-radius: 16px; text-align: center; margin-bottom: 16px; font-size: 18px; font-weight: 700; color: #1a1a2e; }
-        .currency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-        .currency-item { background: rgba(255,255,255,0.5); backdrop-filter: blur(4px); padding: 14px; border-radius: 16px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
-        .currency-item .code { font-weight: 700; font-size: 16px; }
-        .currency-item .rate { font-size: 20px; font-weight: 600; color: #2d6a4f; }
-        .settings-item { background: rgba(255,255,255,0.5); backdrop-filter: blur(4px); padding: 16px 18px; border-radius: 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-        .settings-item .label { font-weight: 500; flex: 1; min-width: 100px; }
+        .empty { color: rgba(255,255,255,0.2); text-align: center; padding: 30px 0; font-size: 14px; }
+        .total-box {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(8px);
+            padding: 14px 16px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .currency-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .currency-item {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(8px);
+            padding: 14px 8px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .currency-item .code { font-weight: 600; font-size: 13px; color: rgba(255,255,255,0.5); }
+        .currency-item .rate { font-size: 18px; font-weight: 700; color: #fff; margin-top: 2px; }
+        .settings-item {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(8px);
+            padding: 16px 18px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .settings-item .label { font-weight: 500; color: #fff; flex: 1; min-width: 100px; }
+        .settings-item .desc { font-size: 11px; color: rgba(255,255,255,0.3); width: 100%; }
         .settings-item input[type="file"] { display: none; }
-        .file-label { background: #457b9d; color: white; padding: 6px 16px; border-radius: 30px; font-size: 13px; cursor: pointer; display: inline-block; }
-        .settings-item .desc { font-size: 12px; color: #6c757d; width: 100%; }
+        .file-label { background: rgba(255,255,255,0.08); color: #fff; padding: 6px 16px; border-radius: 60px; font-size: 12px; cursor: pointer; display: inline-block; border: 1px solid rgba(255,255,255,0.06); }
+        .file-label:active { background: rgba(255,255,255,0.12); }
+        input[type="date"] { color-scheme: dark; }
     </style>
 </head>
 <body id="appBody">
 <div id="app">
     <div class="header">
-        <h1>📆 <span>Ödeme</span> Tablosu</h1>
+        <h1>📆 <span>Ödeme</span> Takip</h1>
         <button class="back-btn" id="globalBackBtn" style="display:none;" onclick="goHome()">✕</button>
     </div>
     <div id="toast" class="toast"></div>
 
-    <!-- ANA SAYFA -->
+    <!-- ===== ANA SAYFA ===== -->
     <div id="page-home" class="page active">
         <div class="summary-grid">
             <div class="summary-card"><div class="label">Bugün Vadesi Gelen</div><div class="value danger" id="todayTotal">₺0</div></div>
@@ -109,95 +356,95 @@
         </div>
 
         <div class="menu-grid">
-            <div class="menu-card" onclick="showPage('page-aylik')"><span>📋</span>Aylık</div>
-            <div class="menu-card" onclick="showPage('page-haftalik')"><span>📅</span>Bu Hafta</div>
-            <div class="menu-card" onclick="showPage('page-gunluk')"><span>📆</span>Bugün</div>
-            <div class="menu-card" onclick="showPage('page-odenmis')"><span>✅</span>Ödenenler</div>
-            <div class="menu-card" onclick="showPage('page-odenmemis')"><span>⏳</span>Ödenmeyenler</div>
-            <div class="menu-card" onclick="showPage('page-buyuk')"><span>💰</span>Büyük</div>
-            <div class="menu-card" onclick="showPage('page-diger')"><span>📌</span>Diğer</div>
-            <div class="menu-card" onclick="showPage('page-currency')"><span>💱</span>Döviz</div>
-            <div class="menu-card" onclick="showPage('page-settings')"><span>⚙️</span>Ayarlar</div>
+            <div class="menu-card" onclick="showPage('page-aylik')"><span>📋</span><div class="label">Aylık</div></div>
+            <div class="menu-card" onclick="showPage('page-haftalik')"><span>📅</span><div class="label">Bu Hafta</div></div>
+            <div class="menu-card" onclick="showPage('page-gunluk')"><span>📆</span><div class="label">Bugün</div></div>
+            <div class="menu-card" onclick="showPage('page-odenmis')"><span>✅</span><div class="label">Ödenenler</div></div>
+            <div class="menu-card" onclick="showPage('page-odenmemis')"><span>⏳</span><div class="label">Ödenmeyenler</div></div>
+            <div class="menu-card" onclick="showPage('page-buyuk')"><span>💰</span><div class="label">Büyük</div></div>
+            <div class="menu-card" onclick="showPage('page-diger')"><span>📌</span><div class="label">Diğer</div></div>
+            <div class="menu-card" onclick="showPage('page-currency')"><span>💱</span><div class="label">Döviz</div></div>
+            <div class="menu-card" onclick="showPage('page-settings')"><span>⚙️</span><div class="label">Ayarlar</div></div>
         </div>
     </div>
 
-    <!-- AYLIK -->
+    <!-- ===== AYLIK ===== -->
     <div id="page-aylik" class="page">
-        <h3 style="margin-bottom:12px;">📋 Tüm Normal Ödemeler</h3>
+        <h3 style="color:#fff; margin-bottom:12px;">📋 Tüm Normal Ödemeler</h3>
         <div id="aylikList"></div>
-        <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
+        <button class="btn" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- HAFTALIK (tüm kategoriler) -->
+    <!-- ===== HAFTALIK ===== -->
     <div id="page-haftalik" class="page">
-        <h3 style="margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
+        <h3 style="color:#fff; margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
         <div id="haftalikList"></div>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- GÜNLÜK (tüm kategoriler) -->
+    <!-- ===== GÜNLÜK ===== -->
     <div id="page-gunluk" class="page">
-        <h3 style="margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
+        <h3 style="color:#fff; margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
         <div id="gunlukList"></div>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- ÖDENENLER (sadece normal) -->
+    <!-- ===== ÖDENENLER ===== -->
     <div id="page-odenmis" class="page">
-        <h3 style="margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
+        <h3 style="color:#fff; margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
         <div id="odenmisList"></div>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- ÖDENMEYENLER (sadece normal) -->
+    <!-- ===== ÖDENMEYENLER ===== -->
     <div id="page-odenmemis" class="page">
-        <h3 style="margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
+        <h3 style="color:#fff; margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
         <div id="odenmemisList"></div>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- BÜYÜK -->
+    <!-- ===== BÜYÜK ===== -->
     <div id="page-buyuk" class="page">
-        <h3 style="margin-bottom:12px;">💰 Büyük Ödemeler</h3>
+        <h3 style="color:#fff; margin-bottom:12px;">💰 Büyük Ödemeler</h3>
         <div class="total-box" id="buyukTotal">Toplam: ₺0</div>
         <div id="buyukList"></div>
-        <button class="btn btn-sm" onclick="showAddModalWithCategory('buyuk')" style="margin-top:8px;">➕ Yeni Büyük Ödeme</button>
+        <button class="btn" onclick="showAddModalWithCategory('buyuk')" style="margin-top:8px;">➕ Yeni Büyük Ödeme</button>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- DİĞER -->
+    <!-- ===== DİĞER ===== -->
     <div id="page-diger" class="page">
-        <h3 style="margin-bottom:12px;">📌 Diğer Ödemeler</h3>
+        <h3 style="color:#fff; margin-bottom:12px;">📌 Diğer Ödemeler</h3>
         <div class="total-box" id="digerTotal">Toplam: ₺0</div>
         <div id="digerList"></div>
-        <button class="btn btn-sm" onclick="showAddModalWithCategory('diger')" style="margin-top:8px;">➕ Yeni Diğer Ödeme</button>
+        <button class="btn" onclick="showAddModalWithCategory('diger')" style="margin-top:8px;">➕ Yeni Diğer Ödeme</button>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- DÖVİZ -->
+    <!-- ===== DÖVİZ ===== -->
     <div id="page-currency" class="page">
-        <h3 style="margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:#6c757d;">(Frankfurter)</small></h3>
+        <h3 style="color:#fff; margin-bottom:12px;">💱 Döviz Kurları</h3>
         <div id="currencyList" class="currency-grid"></div>
-        <button class="btn btn-sm btn-secondary" onclick="fetchCurrency()" style="margin-top:8px;">🔄 Kurları Yenile</button>
+        <button class="btn btn-sm btn-secondary" onclick="fetchCurrency()" style="margin-top:12px; width:auto; margin-left:auto; margin-right:auto;">🔄 Yenile</button>
         <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
     </div>
 
-    <!-- AYARLAR -->
+    <!-- ===== AYARLAR ===== -->
     <div id="page-settings" class="page">
-        <h3 style="margin-bottom:16px;">⚙️ Ayarlar</h3>
+        <h3 style="color:#fff; margin-bottom:16px;">⚙️ Ayarlar</h3>
         <div class="settings-item">
             <span class="label">Arka Plan Görseli</span>
-            <button class="btn btn-sm file-label" onclick="document.getElementById('bgImageInput').click()">📁 Galeriden Seç</button>
+            <button class="file-label" onclick="document.getElementById('bgImageInput').click()">📁 Seç</button>
             <input type="file" id="bgImageInput" accept="image/*" style="display:none;" onchange="handleBgImage(event)">
-            <button class="btn btn-sm btn-danger" onclick="removeBgImage()" style="width:auto;">Kaldır</button>
+            <button class="btn btn-sm btn-danger" onclick="removeBgImage()" style="width:auto; padding:6px 16px;">Kaldır</button>
             <div class="desc">Bir resim seçin, uygulama arka planı değişsin.</div>
         </div>
-        <div id="bgPreview" style="display:none; margin-bottom:10px;"><img id="bgPreviewImg" style="width:100%; max-height:100px; object-fit:cover; border-radius:12px;"></div>
+        <div id="bgPreview" style="display:none; margin-bottom:10px;"><img id="bgPreviewImg" style="width:100%; max-height:100px; object-fit:cover; border-radius:20px;"></div>
         <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
     </div>
 
-    <!-- EKLEME MODAL -->
+    <!-- ===== EKLEME MODAL ===== -->
     <div class="modal-overlay" id="addModal">
         <div class="modal-box">
             <h2 id="addModalTitle">➕ Yeni Ödeme</h2>
@@ -228,7 +475,7 @@
         </div>
     </div>
 
-    <!-- DÜZENLEME MODAL -->
+    <!-- ===== DÜZENLEME MODAL ===== -->
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
             <h2>✏️ Ödeme Düzenle</h2>
@@ -262,6 +509,16 @@
 
 <script>
     // ============================================================
+    // FORMAT FONKSİYONU (₺1.234,56)
+    // ============================================================
+    function formatMoney(amount) {
+        if (amount === undefined || amount === null) return '₺0,00';
+        const num = parseFloat(amount);
+        if (isNaN(num)) return '₺0,00';
+        return '₺' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    // ============================================================
     // VERİTABANI (IndexedDB)
     // ============================================================
     const DB_NAME = 'OdemeDB';
@@ -270,7 +527,7 @@
 
     function openDB() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 3);
+            const request = indexedDB.open(DB_NAME, 4);
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
                 if (!db.objectStoreNames.contains(STORE_NAME)) {
@@ -385,7 +642,7 @@
     function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
     // ============================================================
-    // ÖZET KARTLARI (sadece normal kategori)
+    // ÖZET KARTLARI
     // ============================================================
     async function renderSummary() {
         try {
@@ -411,10 +668,10 @@
                 } else upcomingTotal += amount;
             });
 
-            document.getElementById('todayTotal').textContent = '₺' + todayTotal.toFixed(2);
-            document.getElementById('overdueTotal').textContent = '₺' + overdueTotal.toFixed(2);
-            document.getElementById('upcomingTotal').textContent = '₺' + upcomingTotal.toFixed(2);
-            document.getElementById('todayPaymentsTotal').textContent = '₺' + todayPaymentsTotal.toFixed(2);
+            document.getElementById('todayTotal').textContent = formatMoney(todayTotal);
+            document.getElementById('overdueTotal').textContent = formatMoney(overdueTotal);
+            document.getElementById('upcomingTotal').textContent = formatMoney(upcomingTotal);
+            document.getElementById('todayPaymentsTotal').textContent = formatMoney(todayPaymentsTotal);
         } catch (e) {
             showToast('❌ Özet yüklenirken hata: ' + e.message);
         }
@@ -427,17 +684,17 @@
         const today = new Date().toISOString().split('T')[0];
         const isOverdue = p.date < today && !p.paid;
         const isToday = p.date === today && !p.paid;
-        let badge = '';
-        if (p.paid) badge = '<span class="badge odendi">Ödendi</span>';
-        else if (isOverdue) badge = '<span class="badge gecikmis">Gecikmiş</span>';
-        else if (isToday) badge = '<span class="badge" style="background:#f4a261;color:#1a1a2e;">Bugün</span>';
+        let badgeClass = '', badgeText = '';
+        if (p.paid) { badgeClass = 'odendi'; badgeText = 'Ödendi'; }
+        else if (isOverdue) { badgeClass = 'gecikmis'; badgeText = 'Gecikmiş'; }
+        else if (isToday) { badgeClass = 'bugun'; badgeText = 'Bugün'; }
 
         return `
             <div class="payment-item">
                 <div class="info">
-                    <h4>${p.name} <span style="font-weight:700;color:#2d6a4f;">₺${parseFloat(p.amount).toFixed(2)}</span></h4>
+                    <h4>${p.name} <span style="float:right; color:#69db7c;">${formatMoney(p.amount)}</span></h4>
                     <p>📅 ${p.date} · ${p.period} ${p.note ? '· ' + p.note : ''} ${p.category && p.category !== 'normal' ? '· ' + p.category : ''}</p>
-                    <p>${badge}</p>
+                    <p>${badgeText ? '<span class="badge ' + badgeClass + '">' + badgeText + '</span>' : ''}</p>
                 </div>
                 <div class="actions">
                     <button onclick="togglePaid(${p.id})" title="Ödendi/Ödenmedi">${p.paid ? '✅' : '⬜'}</button>
@@ -525,7 +782,7 @@
             const payments = await getPayments();
             const filtered = payments.filter(p => p.category === 'buyuk').sort((a,b) => new Date(a.date) - new Date(b.date));
             const total = filtered.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
-            document.getElementById('buyukTotal').textContent = 'Toplam: ₺' + total.toFixed(2);
+            document.getElementById('buyukTotal').textContent = 'Toplam: ' + formatMoney(total);
             const container = document.getElementById('buyukList');
             if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Büyük ödeme yok</div>'; return; }
             container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
@@ -538,7 +795,7 @@
             const payments = await getPayments();
             const filtered = payments.filter(p => p.category === 'diger').sort((a,b) => new Date(a.date) - new Date(b.date));
             const total = filtered.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
-            document.getElementById('digerTotal').textContent = 'Toplam: ₺' + total.toFixed(2);
+            document.getElementById('digerTotal').textContent = 'Toplam: ' + formatMoney(total);
             const container = document.getElementById('digerList');
             if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Diğer ödeme yok</div>'; return; }
             container.innerHTML = filtered.map(p => renderPaymentItem(p)).join('');
@@ -703,11 +960,11 @@
     }
 
     // ============================================================
-    // DÖVİZ KURLARI (Frankfurter API – kararlı)
+    // DÖVİZ KURLARI
     // ============================================================
     async function fetchCurrency() {
         const container = document.getElementById('currencyList');
-        container.innerHTML = '<div style="text-align:center;padding:20px;">⏳ Yükleniyor...</div>';
+        container.innerHTML = '<div style="text-align:center;padding:20px; color:rgba(255,255,255,0.3);">⏳ Yükleniyor...</div>';
         try {
             const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR,GBP,CHF,JPY');
             if (!res.ok) throw new Error('API yanıt vermedi');
@@ -725,17 +982,15 @@
                 container.innerHTML = currencies.map(c => `
                     <div class="currency-item">
                         <div class="code">${c.code}</div>
-                        <div class="rate">₺${c.rate.toFixed(4)}</div>
+                        <div class="rate">${formatMoney(c.rate)}</div>
                     </div>
                 `).join('');
-                // Başarılı veriyi yedekle
                 localStorage.setItem('currencyBackup', JSON.stringify(currencies));
             } else {
                 throw new Error('Veri formatı hatalı');
             }
         } catch (e) {
             console.error('Döviz hatası:', e);
-            // Yedek veriyi dene
             const backup = localStorage.getItem('currencyBackup');
             if (backup) {
                 try {
@@ -743,10 +998,10 @@
                     container.innerHTML = parsed.map(c => `
                         <div class="currency-item">
                             <div class="code">${c.code}</div>
-                            <div class="rate">₺${c.rate.toFixed(4)}</div>
+                            <div class="rate">${formatMoney(c.rate)}</div>
                         </div>
                     `).join('');
-                    container.innerHTML += '<div style="text-align:center;font-size:11px;color:#6c757d;margin-top:8px;">⚠️ Güncel olmayan veri (yedek)</div>';
+                    container.innerHTML += '<div style="text-align:center;font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;">⚠️ Yedek veri</div>';
                 } catch (e2) {
                     showFallback(container);
                 }
@@ -757,7 +1012,6 @@
     }
 
     function showFallback(container) {
-        // Gerçekçi örnek veri (yaklaşık)
         const fallback = [
             { code: 'USD/TRY', rate: 33.20 },
             { code: 'EUR/TRY', rate: 36.10 },
@@ -768,10 +1022,10 @@
         container.innerHTML = fallback.map(c => `
             <div class="currency-item">
                 <div class="code">${c.code}</div>
-                <div class="rate">₺${c.rate.toFixed(4)}</div>
+                <div class="rate">${formatMoney(c.rate)}</div>
             </div>
         `).join('');
-        container.innerHTML += '<div style="text-align:center;font-size:11px;color:#d62828;margin-top:8px;">❌ Güncel veri alınamadı, tahmini değerler</div>';
+        container.innerHTML += '<div style="text-align:center;font-size:10px;color:rgba(255,100,100,0.4);margin-top:8px;">❌ Güncel değil, tahmini</div>';
     }
 
     // ============================================================
@@ -783,6 +1037,9 @@
             document.getElementById('appBody').style.backgroundImage = `url(${data})`;
             document.getElementById('bgPreviewImg').src = data;
             document.getElementById('bgPreview').style.display = 'block';
+        } else {
+            // Varsayılan gradient
+            document.getElementById('appBody').style.background = 'linear-gradient(145deg, #0a0e27 0%, #1a1e3a 100%)';
         }
     }
 
@@ -809,7 +1066,7 @@
 
     function removeBgImage() {
         localStorage.removeItem('odemeBgImage');
-        document.getElementById('appBody').style.backgroundImage = '';
+        document.getElementById('appBody').style.background = 'linear-gradient(145deg, #0a0e27 0%, #1a1e3a 100%)';
         document.getElementById('bgPreview').style.display = 'none';
         showToast('🗑️ Arka plan kaldırıldı');
     }
@@ -838,7 +1095,6 @@
                 showToast('📋 Örnek ödemeler eklendi');
             }
             await renderSummary();
-            // Döviz verisini arka planda çek
             fetchCurrency();
         } catch (e) {
             console.error(e);
