@@ -7,9 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
-        /* ============================================================
-               TEMEL DEĞİŞKENLER (Tema)
-               ============================================================ */
         :root {
             --bg-primary: #f4f6f9;
             --bg-card: rgba(255, 255, 255, 0.85);
@@ -23,7 +20,6 @@
             --gradient-start: #667eea;
             --gradient-end: #764ba2;
         }
-
         [data-theme="dark"] {
             --bg-primary: #121212;
             --bg-card: rgba(30, 30, 46, 0.85);
@@ -37,7 +33,6 @@
             --gradient-start: #1a1a2e;
             --gradient-end: #16213e;
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -45,7 +40,6 @@
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             transition: background 0.3s, color 0.3s, border-color 0.3s;
         }
-
         body {
             background: var(--bg-primary);
             display: flex;
@@ -55,9 +49,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            transition: background 0.5s ease;
         }
-
         #app {
             max-width: 520px;
             width: 100%;
@@ -71,9 +63,7 @@
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border-color);
-            position: relative;
         }
-
         .header {
             display: flex;
             justify-content: space-between;
@@ -104,10 +94,6 @@
             transform: scale(0.9);
             background: rgba(0, 0, 0, 0.1);
         }
-
-        /* ============================================================
-               BUTONLAR
-               ============================================================ */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -147,10 +133,6 @@
             font-size: 12px;
             width: auto;
         }
-
-        /* ============================================================
-               SAYFALAR
-               ============================================================ */
         .page {
             display: none;
             animation: fadeUp 0.4s ease;
@@ -168,10 +150,6 @@
                 transform: translateY(0);
             }
         }
-
-        /* ============================================================
-               ÖZET KARTLARI
-               ============================================================ */
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -206,10 +184,6 @@
         .summary-card .value.success {
             color: #2d6a4f;
         }
-
-        /* ============================================================
-               MENÜ
-               ============================================================ */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -239,10 +213,6 @@
             display: block;
             margin-bottom: 4px;
         }
-
-        /* ============================================================
-               LİSTE ÖĞELERİ
-               ============================================================ */
         .payment-item {
             background: var(--bg-glass);
             backdrop-filter: blur(8px);
@@ -310,10 +280,6 @@
         .payment-item .actions button:active {
             background: rgba(0, 0, 0, 0.1);
         }
-
-        /* ============================================================
-               MODAL
-               ============================================================ */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -374,10 +340,6 @@
         .modal-box .btn-group .btn {
             flex: 1;
         }
-
-        /* ============================================================
-               TOAST
-               ============================================================ */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -409,7 +371,6 @@
                 transform: translateX(-50%) scale(1);
             }
         }
-
         .empty {
             color: var(--text-secondary);
             text-align: center;
@@ -428,10 +389,6 @@
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
-
-        /* ============================================================
-               TAKVİM
-               ============================================================ */
         .calendar {
             background: var(--bg-glass);
             border-radius: 24px;
@@ -511,10 +468,6 @@
             background: var(--accent);
             color: #fff;
         }
-
-        /* ============================================================
-               GRAFİK KONTEYNERİ
-               ============================================================ */
         .chart-container {
             background: var(--bg-glass);
             border-radius: 20px;
@@ -525,10 +478,6 @@
         .chart-container canvas {
             max-height: 180px;
         }
-
-        /* ============================================================
-               İSTATİSTİK KARTLARI
-               ============================================================ */
         .stat-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -551,10 +500,6 @@
             font-size: 11px;
             color: var(--text-secondary);
         }
-
-        /* ============================================================
-               DİĞER
-               ============================================================ */
         .flex {
             display: flex;
             gap: 8px;
@@ -570,7 +515,6 @@
         .w-full {
             width: 100%;
         }
-
         .settings-item {
             background: var(--bg-glass);
             backdrop-filter: blur(8px);
@@ -617,7 +561,6 @@
             cursor: pointer;
             display: inline-block;
         }
-
         .currency-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -641,7 +584,6 @@
             font-weight: 600;
             color: var(--accent);
         }
-
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -652,7 +594,6 @@
             background: var(--border-color);
             border-radius: 10px;
         }
-
         @media (max-width: 480px) {
             #app {
                 padding: 16px 12px;
@@ -686,7 +627,7 @@
         </div>
         <div id="toast" class="toast"></div>
 
-        <!-- ===== ANA SAYFA ===== -->
+        <!-- ANA SAYFA -->
         <div id="page-home" class="page active">
             <div class="summary-grid">
                 <div class="summary-card"><div class="label">Bugün Vadesi Gelen</div><div class="value danger" id="todayTotal">₺0</div></div>
@@ -714,7 +655,7 @@
             </div>
         </div>
 
-        <!-- ===== AYLIK ===== -->
+        <!-- AYLIK -->
         <div id="page-aylik" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📋 Tüm Normal Ödemeler</h3>
             <input type="text" id="searchInput" placeholder="🔍 Ara (firma, kategori, tutar, not...)" style="width:100%;padding:10px 14px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-glass);color:var(--text-primary);margin-bottom:12px;">
@@ -723,35 +664,35 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== HAFTALIK ===== -->
+        <!-- HAFTALIK -->
         <div id="page-haftalik" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
             <div id="haftalikList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== GÜNLÜK ===== -->
+        <!-- GÜNLÜK -->
         <div id="page-gunluk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
             <div id="gunlukList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== ÖDENENLER ===== -->
+        <!-- ÖDENENLER -->
         <div id="page-odenmis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
             <div id="odenmisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== ÖDENMEYENLER ===== -->
+        <!-- ÖDENMEYENLER -->
         <div id="page-odenmemis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
             <div id="odenmemisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== BÜYÜK ===== -->
+        <!-- BÜYÜK -->
         <div id="page-buyuk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💰 Büyük Ödemeler</h3>
             <div class="total-box" id="buyukTotal">Toplam: ₺0</div>
@@ -760,7 +701,7 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== DİĞER ===== -->
+        <!-- DİĞER -->
         <div id="page-diger" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📌 Diğer Ödemeler</h3>
             <div class="total-box" id="digerTotal">Toplam: ₺0</div>
@@ -769,7 +710,7 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== TAKVİM ===== -->
+        <!-- TAKVİM -->
         <div id="page-calendar" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">🗓️ Takvim</h3>
             <div class="calendar" id="calendarContainer">
@@ -787,7 +728,7 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== GRAFİKLER ===== -->
+        <!-- GRAFİKLER -->
         <div id="page-charts" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📊 Grafikler</h3>
             <div class="chart-container"><canvas id="chart30days"></canvas></div>
@@ -797,14 +738,14 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== İSTATİSTİK ===== -->
+        <!-- İSTATİSTİK -->
         <div id="page-stats" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📈 İstatistikler</h3>
             <div class="stat-grid" id="statsGrid"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== KATEGORİLER ===== -->
+        <!-- KATEGORİLER -->
         <div id="page-categories" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">🏷️ Kategoriler</h3>
             <div id="categoryList" style="margin-bottom:12px;"></div>
@@ -815,7 +756,7 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== DÖVİZ ===== -->
+        <!-- DÖVİZ -->
         <div id="page-currency" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:var(--text-secondary);">(Frankfurter)</small></h3>
             <div id="currencyList" class="currency-grid"></div>
@@ -823,7 +764,7 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== AYARLAR ===== -->
+        <!-- AYARLAR -->
         <div id="page-settings" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:16px;">⚙️ Ayarlar</h3>
 
@@ -883,13 +824,13 @@
 
             <div class="settings-item">
                 <span class="label">ℹ️ Hakkında</span>
-                <span style="color:var(--text-secondary);">v3.0 • 13 özellik</span>
+                <span style="color:var(--text-secondary);">v3.1 • 13 özellik</span>
             </div>
 
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== EKLEME MODAL ===== -->
+        <!-- EKLEME MODAL -->
         <div class="modal-overlay" id="addModal">
             <div class="modal-box">
                 <h2 id="addModalTitle">➕ Yeni Ödeme</h2>
@@ -935,7 +876,7 @@
             </div>
         </div>
 
-        <!-- ===== DÜZENLEME MODAL ===== -->
+        <!-- DÜZENLEME MODAL -->
         <div class="modal-overlay" id="editModal">
             <div class="modal-box">
                 <h2>✏️ Ödeme Düzenle</h2>
@@ -996,15 +937,17 @@
         }
 
         // ================================================================
-        // VERİTABANI (IndexedDB)
+        // VERİTABANI (IndexedDB) - DÜZELTİLDİ
         // ================================================================
         const DB_NAME = 'OdemeDB';
         const STORE_NAME = 'odemeler';
         const CATEGORY_STORE = 'kategoriler';
         let db = null;
+        let dbOpenPromise = null;
 
         function openDB() {
-            return new Promise((resolve, reject) => {
+            if (dbOpenPromise) return dbOpenPromise;
+            dbOpenPromise = new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, 5);
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
@@ -1015,10 +958,15 @@
                         db.createObjectStore(CATEGORY_STORE, { keyPath: 'name' });
                     }
                 };
-                request.onsuccess = (e) => { db = e.target.result;
-                    resolve(db); };
-                request.onerror = (e) => reject(e);
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    resolve(db);
+                };
+                request.onerror = (e) => {
+                    reject(e.target.error);
+                };
             });
+            return dbOpenPromise;
         }
 
         async function getDB() {
@@ -1143,7 +1091,7 @@
         }
 
         // ================================================================
-        // EKLEME MODAL
+        // EKLEME MODAL - DÜZELTİLDİ
         // ================================================================
         function showAddModalWithCategory(category) {
             document.getElementById('addModal').classList.add('active');
@@ -1152,17 +1100,30 @@
             document.getElementById('addCategorySelect').disabled = true;
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('addDate').value = today;
+            // Kategori seçimini doldur (zaten dolu olabilir, ama emin olalım)
+            populateCategorySelect('addCategorySelect');
         }
 
         async function showAddModal() {
+            try {
+                document.getElementById('addModal').classList.add('active');
+                document.getElementById('addModalTitle').textContent = '➕ Yeni Ödeme';
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('addDate').value = today;
+                document.getElementById('addCategorySelect').disabled = false;
+                await populateCategorySelect('addCategorySelect');
+            } catch (e) {
+                showToast('❌ Kategoriler yüklenirken hata: ' + e.message);
+            }
+        }
+
+        async function populateCategorySelect(selectId) {
             const categories = await getCategories();
-            const sel = document.getElementById('addCategorySelect');
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            const currentVal = sel.value;
             sel.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
-            sel.disabled = false;
-            document.getElementById('addModal').classList.add('active');
-            document.getElementById('addModalTitle').textContent = '➕ Yeni Ödeme';
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('addDate').value = today;
+            if (categories.includes(currentVal)) sel.value = currentVal;
         }
 
         function closeAddModal() {
@@ -1346,7 +1307,7 @@
         }
 
         // ================================================================
-        // TEK TIKLA ÖDEME (Ödendi/Ödenmedi)
+        // TEK TIKLA ÖDEME
         // ================================================================
         async function togglePaid(id) {
             try {
@@ -1390,11 +1351,13 @@
         }
 
         // ================================================================
-        // EKLEME
+        // EKLEME - DÜZELTİLDİ
         // ================================================================
         async function addPayment() {
             try {
+                // Veritabanını kontrol et
                 await getDB();
+
                 const name = document.getElementById('addName').value.trim();
                 const amount = parseFloat(document.getElementById('addAmount').value);
                 const date = document.getElementById('addDate').value;
@@ -1419,8 +1382,8 @@
                 refreshCurrentPage();
                 updateCharts();
             } catch (e) {
-                console.error(e);
-                showToast('❌ Hata: ' + e.message);
+                console.error('Ekleme hatası:', e);
+                showToast('❌ Ödeme eklenirken hata: ' + e.message);
             }
         }
 
@@ -1507,7 +1470,7 @@
         async function renderCalendar() {
             const year = calendarDate.getFullYear();
             const month = calendarDate.getMonth();
-            const firstDay = new Date(year, month, 1).getDay(); // 0=Pazar
+            const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const today = new Date();
 
@@ -1520,7 +1483,6 @@
             const grid = document.getElementById('calendarDays');
             grid.innerHTML = '';
 
-            // Boş günler (hafta başı)
             const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
             for (let i = 0; i < startOffset; i++) {
                 const empty = document.createElement('div');
@@ -1535,7 +1497,6 @@
                 const isToday = dateStr === today.toISOString().split('T')[0];
                 if (isToday) dayDiv.classList.add('today');
 
-                // O güne ait ödemeler
                 const dayPayments = payments.filter(p => p.date === dateStr);
                 let hasOverdue = false,
                     hasUpcoming = false,
@@ -1558,7 +1519,6 @@
                 dayDiv.addEventListener('click', () => showDayDetail(dateStr, dayPayments));
                 grid.appendChild(dayDiv);
             }
-            // Takvim altında detay gösterimi
             document.getElementById('calendarDayDetail').innerHTML = '';
         }
 
@@ -1581,62 +1541,62 @@
         }
 
         // ================================================================
-        // GRAFİKLER (Chart.js)
+        // GRAFİKLER
         // ================================================================
         let charts = {};
 
         async function updateCharts() {
-            const payments = await getPayments();
-            // Son 30 gün
-            const today = new Date();
-            const dates = [];
-            const amounts = [];
-            for (let i = 29; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(d.getDate() - i);
-                const ds = d.toISOString().split('T')[0];
-                dates.push(ds);
-                const sum = payments.filter(p => p.date === ds).reduce((s, p) => s + parseFloat(p.amount || 0), 0);
-                amounts.push(sum);
-            }
-            createChart('chart30days', 'Son 30 Gün', dates, amounts, 'line', '#2d6a4f');
+            try {
+                const payments = await getPayments();
+                const today = new Date();
+                const dates = [];
+                const amounts = [];
+                for (let i = 29; i >= 0; i--) {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() - i);
+                    const ds = d.toISOString().split('T')[0];
+                    dates.push(ds);
+                    const sum = payments.filter(p => p.date === ds).reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+                    amounts.push(sum);
+                }
+                createChart('chart30days', 'Son 30 Gün', dates, amounts, 'line', '#2d6a4f');
 
-            // Aylık gider (son 6 ay)
-            const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
-            const months = [];
-            const monthlyTotals = [];
-            for (let i = 5; i >= 0; i--) {
-                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-                const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-                months.push(monthNames[d.getMonth()] + ' ' + d.getFullYear());
-                const sum = payments.filter(p => p.date.startsWith(key)).reduce((s, p) => s + parseFloat(p.amount || 0), 0);
-                monthlyTotals.push(sum);
-            }
-            createChart('chartMonthly', 'Aylık Gider (Son 6 Ay)', months, monthlyTotals, 'bar', '#457b9d');
+                const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+                const months = [];
+                const monthlyTotals = [];
+                for (let i = 5; i >= 0; i--) {
+                    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                    months.push(monthNames[d.getMonth()] + ' ' + d.getFullYear());
+                    const sum = payments.filter(p => p.date.startsWith(key)).reduce((s, p) => s + parseFloat(p.amount || 0),
+                    0);
+                    monthlyTotals.push(sum);
+                }
+                createChart('chartMonthly', 'Aylık Gider (Son 6 Ay)', months, monthlyTotals, 'bar', '#457b9d');
 
-            // Kategori bazlı pasta
-            const catMap = {};
-            payments.forEach(p => {
-                const cat = p.category || 'normal';
-                catMap[cat] = (catMap[cat] || 0) + parseFloat(p.amount || 0);
-            });
-            const catLabels = Object.keys(catMap);
-            const catValues = Object.values(catMap);
-            createChart('chartCategory', 'Kategori Dağılımı', catLabels, catValues, 'pie', ['#2d6a4f', '#457b9d', '#d62828',
-                '#f4a261', '#6c757d', '#ffd700'
-            ]);
+                const catMap = {};
+                payments.forEach(p => {
+                    const cat = p.category || 'normal';
+                    catMap[cat] = (catMap[cat] || 0) + parseFloat(p.amount || 0);
+                });
+                const catLabels = Object.keys(catMap);
+                const catValues = Object.values(catMap);
+                createChart('chartCategory', 'Kategori Dağılımı', catLabels, catValues, 'pie', ['#2d6a4f', '#457b9d',
+                    '#d62828', '#f4a261', '#6c757d', '#ffd700'
+                ]);
 
-            // Son 12 ay
-            const last12 = [];
-            const last12Totals = [];
-            for (let i = 11; i >= 0; i--) {
-                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-                const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-                last12.push(monthNames[d.getMonth()] + ' ' + d.getFullYear());
-                const sum = payments.filter(p => p.date.startsWith(key)).reduce((s, p) => s + parseFloat(p.amount || 0), 0);
-                last12Totals.push(sum);
-            }
-            createChart('chart12months', 'Son 12 Ay', last12, last12Totals, 'line', '#d62828');
+                const last12 = [];
+                const last12Totals = [];
+                for (let i = 11; i >= 0; i--) {
+                    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                    last12.push(monthNames[d.getMonth()] + ' ' + d.getFullYear());
+                    const sum = payments.filter(p => p.date.startsWith(key)).reduce((s, p) => s + parseFloat(p.amount || 0),
+                    0);
+                    last12Totals.push(sum);
+                }
+                createChart('chart12months', 'Son 12 Ay', last12, last12Totals, 'line', '#d62828');
+            } catch (e) { console.error('Grafik hatası:', e); }
         }
 
         function createChart(id, label, labels, data, type, color) {
@@ -1683,18 +1643,15 @@
                 const avg = totalAmount / total;
                 const max = Math.max(...payments.map(p => parseFloat(p.amount || 0)));
                 const min = Math.min(...payments.map(p => parseFloat(p.amount || 0)));
-                // En çok ödeme yapılan firma
                 const firmMap = {};
                 payments.forEach(p => { firmMap[p.name] = (firmMap[p.name] || 0) + parseFloat(p.amount || 0); });
                 const topFirm = Object.keys(firmMap).reduce((a, b) => firmMap[a] > firmMap[b] ? a : b, '');
-                // En yoğun ay
                 const monthMap = {};
                 payments.forEach(p => {
                     const m = p.date.substring(0, 7);
                     monthMap[m] = (monthMap[m] || 0) + 1;
                 });
                 const topMonth = Object.keys(monthMap).reduce((a, b) => monthMap[a] > monthMap[b] ? a : b, '');
-                // Toplam firma sayısı
                 const firmCount = Object.keys(firmMap).length;
 
                 const stats = [
@@ -1717,15 +1674,17 @@
         // KATEGORİ YÖNETİMİ
         // ================================================================
         async function renderCategories() {
-            const categories = await getCategories();
-            const container = document.getElementById('categoryList');
-            if (!categories.length) { container.innerHTML = '<div class="empty">🏷️ Kategori yok</div>'; return; }
-            container.innerHTML = categories.map(c =>
-                `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-glass);border-radius:30px;margin-bottom:6px;border:1px solid var(--border-color);">
-                    <span>${c}</span>
-                    <button class="btn btn-sm btn-danger" onclick="removeCategory('${c}')" style="width:auto;padding:4px 12px;">Sil</button>
-                </div>`
-            ).join('');
+            try {
+                const categories = await getCategories();
+                const container = document.getElementById('categoryList');
+                if (!categories.length) { container.innerHTML = '<div class="empty">🏷️ Kategori yok</div>'; return; }
+                container.innerHTML = categories.map(c =>
+                    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-glass);border-radius:30px;margin-bottom:6px;border:1px solid var(--border-color);">
+                        <span>${c}</span>
+                        <button class="btn btn-sm btn-danger" onclick="removeCategory('${c}')" style="width:auto;padding:4px 12px;">Sil</button>
+                    </div>`
+                ).join('');
+            } catch (e) { showToast('❌ Kategoriler yüklenirken hata: ' + e.message); }
         }
 
         async function addCategory() {
@@ -1748,7 +1707,7 @@
         }
 
         // ================================================================
-        // DÖVİZ KURLARI (Frankfurter)
+        // DÖVİZ KURLARI
         // ================================================================
         async function fetchCurrency() {
             const container = document.getElementById('currencyList');
@@ -1813,7 +1772,6 @@
             if (theme === 'dark') root.setAttribute('data-theme', 'dark');
             else if (theme === 'light') root.removeAttribute('data-theme');
             else {
-                // sistem
                 const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 if (darkMode) root.setAttribute('data-theme', 'dark');
                 else root.removeAttribute('data-theme');
@@ -1873,9 +1831,8 @@
 
         function startNotificationChecker() {
             if (notificationInterval) clearInterval(notificationInterval);
-            // Her 5 dakikada bir kontrol et
             notificationInterval = setInterval(checkNotifications, 300000);
-            checkNotifications(); // hemen çalıştır
+            checkNotifications();
         }
 
         async function checkNotifications() {
@@ -1886,7 +1843,6 @@
                 const reminderDays = parseInt(document.getElementById('reminderDays').value);
                 const notifTime = document.getElementById('notificationTime').value;
 
-                // Vade yaklaşanlar
                 payments.forEach(p => {
                     if (p.paid) return;
                     const pDate = new Date(p.date + 'T00:00:00');
@@ -1894,7 +1850,7 @@
                     if (diff === reminderDays || diff === 0 || diff < 0) {
                         let msg = '';
                         if (diff < 0) msg =
-                        `⚠️ ${p.name} ödemesi ${Math.abs(diff)} gün gecikti! (${formatCurrency(p.amount, p.currency)})`;
+                            `⚠️ ${p.name} ödemesi ${Math.abs(diff)} gün gecikti! (${formatCurrency(p.amount, p.currency)})`;
                         else if (diff === 0) msg =
                             `🔔 ${p.name} ödemesi bugün vadesi geliyor! (${formatCurrency(p.amount, p.currency)})`;
                         else msg =
@@ -1930,7 +1886,7 @@
         }
 
         // ================================================================
-        // DIŞA AKTAR (JSON, CSV)
+        // DIŞA AKTAR
         // ================================================================
         async function exportData(format) {
             const payments = await getPayments();
@@ -1971,7 +1927,6 @@
                 if (!Array.isArray(data)) throw new Error('Geçersiz format');
                 if (data.length === 0) { showToast('❌ Yedek boş'); return; }
                 if (!confirm(`${data.length} ödeme yüklenecek. Mevcut veriler silinecek. Devam?`)) return;
-                // Tüm verileri sil ve yeni verileri ekle
                 const db = await getDB();
                 const tx = db.transaction(STORE_NAME, 'readwrite');
                 const store = tx.objectStore(STORE_NAME);
@@ -2010,7 +1965,7 @@
         }
 
         // ================================================================
-        // TEKRARLAYAN ÖDEMELER (Günlük kontrol)
+        // TEKRARLAYAN ÖDEMELER
         // ================================================================
         async function processRecurringPayments() {
             try {
@@ -2025,7 +1980,6 @@
                         case 'daily':
                             diff = Math.floor((todayDate - pDate) / (1000 * 60 * 60 * 24));
                             if (diff >= 1) {
-                                // Yeni ödeme oluştur
                                 const newPayment = { ...p };
                                 delete newPayment.id;
                                 newPayment.date = today;
@@ -2116,8 +2070,10 @@
 
                 // Kategorileri oluştur (ilk kez)
                 const categories = await getCategories();
-                if (categories.length === 0 || categories.length === defaultCategories.length && categories.every((c, i) =>
-                        c === defaultCategories[i])) {
+                if (categories.length === defaultCategories.length && categories.every((c, i) => c === defaultCategories[
+                    i])) {
+                    // zaten default var, bir şey yapma
+                } else if (categories.length === 0) {
                     for (const cat of defaultCategories) {
                         await saveCategory(cat);
                     }
@@ -2148,19 +2104,15 @@
                 }
 
                 await renderSummary();
-                // Arka plan kontrolü
+                // Arka plan
                 const bg = localStorage.getItem('odemeBgImage');
                 if (bg) {
                     document.getElementById('appBody').style.background = `url(${bg}) center/cover no-repeat fixed`;
                 }
 
-                // Tekrarlayan ödemeleri kontrol et (ilk çalıştırmada)
                 await processRecurringPayments();
-
-                // Periyodik kontrol (günde bir)
                 setInterval(processRecurringPayments, 86400000);
 
-                // Döviz kurlarını arka planda çek
                 fetchCurrency();
             } catch (e) {
                 console.error(e);
