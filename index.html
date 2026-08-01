@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
-        /* ---- AYNI STILLER (Öncekiyle aynı) ---- */
         :root {
             --bg-primary: #f4f6f9;
             --bg-card: rgba(255, 255, 255, 0.85);
@@ -18,6 +17,7 @@
             --border-color: rgba(0, 0, 0, 0.05);
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
             --accent: #2d6a4f;
+            --btn-radius: 30px;
             --gradient-start: #667eea;
             --gradient-end: #764ba2;
         }
@@ -104,7 +104,7 @@
             color: #fff;
             border: none;
             padding: 12px 18px;
-            border-radius: 30px;
+            border-radius: var(--btn-radius);
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -546,6 +546,10 @@
             border-radius: 50%;
             background: none;
         }
+        .settings-item input[type="range"] {
+            flex: 1;
+            min-width: 80px;
+        }
         .settings-item select {
             padding: 8px 12px;
             border-radius: 30px;
@@ -656,44 +660,44 @@
             </div>
         </div>
 
-        <!-- AYLIK -->
+        <!-- AYLIK (sadece içinde bulunulan ay, normal kategorisi) -->
         <div id="page-aylik" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">📋 Tüm Normal Ödemeler</h3>
-            <input type="text" id="searchInput" placeholder="🔍 Ara (firma, kategori, tutar, not...)" style="width:100%;padding:10px 14px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-glass);color:var(--text-primary);margin-bottom:12px;">
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">📋 Bu Ayki Normal Ödemeler</h3>
+            <input type="text" id="searchInput" placeholder="🔍 Ara..." style="width:100%;padding:10px 14px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-glass);color:var(--text-primary);margin-bottom:12px;">
             <div id="aylikList"></div>
             <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- HAFTALIK -->
+        <!-- HAFTALIK (tüm kategoriler) -->
         <div id="page-haftalik" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
             <div id="haftalikList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- GÜNLÜK -->
+        <!-- GÜNLÜK (tüm kategoriler) -->
         <div id="page-gunluk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
             <div id="gunlukList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ÖDENENLER -->
+        <!-- ÖDENENLER (normal) -->
         <div id="page-odenmis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
             <div id="odenmisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ÖDENMEYENLER -->
+        <!-- ÖDENMEYENLER (normal, gecikmiş) -->
         <div id="page-odenmemis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
             <div id="odenmemisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- BÜYÜK -->
+        <!-- BÜYÜK (sadece büyük kategorisi) -->
         <div id="page-buyuk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💰 Büyük Ödemeler</h3>
             <div class="total-box" id="buyukTotal">Toplam: ₺0</div>
@@ -702,7 +706,7 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- DİĞER -->
+        <!-- DİĞER (sadece diğer kategorisi) -->
         <div id="page-diger" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📌 Diğer Ödemeler</h3>
             <div class="total-box" id="digerTotal">Toplam: ₺0</div>
@@ -757,9 +761,9 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- DÖVİZ -->
+        <!-- DÖVİZ (Genelpara.com API) -->
         <div id="page-currency" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:var(--text-secondary);">(Frankfurter)</small></h3>
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:var(--text-secondary);">(Genelpara.com)</small></h3>
             <div id="currencyList" class="currency-grid"></div>
             <button class="btn btn-sm btn-secondary" onclick="fetchCurrency()" style="margin-top:8px;">🔄 Kurları Yenile</button>
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
@@ -780,6 +784,11 @@
             <div class="settings-item">
                 <span class="label">🎨 Ana Renk</span>
                 <input type="color" id="accentColor" value="#2d6a4f" onchange="applyAccentColor()">
+            </div>
+            <div class="settings-item">
+                <span class="label">🔘 Buton Yuvarlaklığı</span>
+                <input type="range" id="btnRadius" min="0" max="50" value="30" oninput="applyButtonStyle()">
+                <span id="btnRadiusVal">30px</span>
             </div>
 
             <div class="settings-item">
@@ -816,6 +825,7 @@
                 <span class="label">📥 Yedekten Geri Yükle</span>
                 <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="restoreData(event)">
                 <button class="btn btn-sm file-label" onclick="document.getElementById('restoreFileInput').click()">📁 Dosya Seç</button>
+                <span style="font-size:11px;color:var(--text-secondary);width:100%;">Web'deki verileri telefonda görmek için dışa aktarıp buradan yükleyin.</span>
             </div>
 
             <div class="settings-item">
@@ -825,7 +835,7 @@
 
             <div class="settings-item">
                 <span class="label">ℹ️ Hakkında</span>
-                <span style="color:var(--text-secondary);">v3.2 • 13 özellik</span>
+                <span style="color:var(--text-secondary);">v3.3 • 13 özellik</span>
             </div>
 
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
@@ -938,7 +948,7 @@
         }
 
         // ================================================================
-        // VERİTABANI (IndexedDB) - BASİT VE SAĞLAM
+        // VERİTABANI (IndexedDB)
         // ================================================================
         const DB_NAME = 'OdemeDB';
         const STORE_NAME = 'odemeler';
@@ -973,7 +983,6 @@
             return db;
         }
 
-        // ----- İŞLEM FONKSİYONLARI -----
         async function getAllPayments() {
             try {
                 const db = await getDB();
@@ -1024,7 +1033,7 @@
             });
         }
 
-        // ----- KATEGORİ İŞLEMLERİ -----
+        // ----- KATEGORİLER -----
         const defaultCategories = ['Kira', 'Elektrik', 'Su', 'Doğalgaz', 'İnternet', 'Telefon', 'Banka', 'Kredi Kartı', 'Kargo',
             'Tedarikçi', 'Maaş', 'Araç', 'Vergi', 'SGK', 'Diğer'
         ];
@@ -1147,16 +1156,13 @@
         }
 
         // ================================================================
-        // EKLEME İŞLEMİ (KESİN ÇALIŞIR - onclick ile)
+        // EKLEME İŞLEMİ
         // ================================================================
         async function addPayment() {
             try {
                 showToast('⏳ Ödeme kaydediliyor...');
-
-                // 1. Veritabanını kontrol et
                 await getDB();
 
-                // 2. Form verilerini al
                 const name = document.getElementById('addName').value.trim();
                 const amount = parseFloat(document.getElementById('addAmount').value);
                 const date = document.getElementById('addDate').value;
@@ -1166,24 +1172,18 @@
                 const currency = document.getElementById('addCurrency').value;
                 const recurrence = document.getElementById('addRecurrence').value;
 
-                // 3. Validasyon
                 if (!name) { showToast('❌ Ad zorunlu'); return; }
                 if (isNaN(amount) || amount <= 0) { showToast('❌ Geçerli tutar girin'); return; }
                 if (!date) { showToast('❌ Tarih seçin'); return; }
 
-                // 4. Kaydet
                 await addPaymentDB({ name, amount, date, period, category, note, paid: false, currency, recurrence });
-
-                // 5. Başarılı
                 showToast('✅ Ödeme eklendi');
                 closeAddModal();
 
-                // 6. Formu temizle
                 document.getElementById('addName').value = '';
                 document.getElementById('addAmount').value = '';
                 document.getElementById('addNote').value = '';
 
-                // 7. Listeleri güncelle
                 await renderSummary();
                 refreshCurrentPage();
                 updateCharts();
@@ -1194,7 +1194,7 @@
         }
 
         // ================================================================
-        // ÖZET KARTLARI
+        // ÖZET KARTLARI (sadece normal kategori)
         // ================================================================
         async function renderSummary() {
             try {
@@ -1264,25 +1264,37 @@
         }
 
         // ================================================================
-        // LİSTE FONKSİYONLARI
+        // AYLIK LİSTE (sadece içinde bulunulan ay, normal kategori)
         // ================================================================
         async function renderAylik() {
             try {
                 const payments = await getAllPayments();
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
                 const search = document.getElementById('searchInput').value.toLowerCase();
-                const filtered = payments.filter(p => (p.category === 'normal' || !p.category) &&
-                    (p.name.toLowerCase().includes(search) ||
-                        (p.category || '').toLowerCase().includes(search) ||
-                        (p.note || '').toLowerCase().includes(search) ||
-                        (p.amount || '').toString().includes(search) ||
-                        (p.currency || '').toLowerCase().includes(search))
-                ).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                const filtered = payments.filter(p => {
+                    const pDate = new Date(p.date + 'T00:00:00');
+                    return (p.category === 'normal' || !p.category) &&
+                        pDate.getMonth() === currentMonth &&
+                        pDate.getFullYear() === currentYear &&
+                        (p.name.toLowerCase().includes(search) ||
+                            (p.category || '').toLowerCase().includes(search) ||
+                            (p.note || '').toLowerCase().includes(search) ||
+                            (p.amount || '').toString().includes(search) ||
+                            (p.currency || '').toLowerCase().includes(search));
+                }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 const container = document.getElementById('aylikList');
-                if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Normal ödeme yok</div>'; return; }
+                if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bu ay normal ödeme yok</div>'; return; }
                 container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
+        // ================================================================
+        // DİĞER LİSTELER (haftalık, günlük, ödenen, ödenmeyen, büyük, diğer)
+        // ================================================================
         async function renderHaftalik() {
             try {
                 const payments = await getAllPayments();
@@ -1728,40 +1740,36 @@
         }
 
         // ================================================================
-        // DÖVİZ KURLARI
+        // DÖVİZ KURLARI (Genelpara.com - Türkiye)
         // ================================================================
         async function fetchCurrency() {
             const container = document.getElementById('currencyList');
             container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);">⏳ Yükleniyor...</div>';
             try {
-                const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR,GBP,CHF,JPY');
+                const res = await fetch('https://api.genelpara.com/embed/doviz.json');
                 if (!res.ok) throw new Error('API yanıt vermedi');
                 const data = await res.json();
-                if (data && data.rates) {
-                    const rates = data.rates;
-                    const currencies = [
-                        { code: 'USD/TRY', rate: rates.TRY },
-                        { code: 'EUR/TRY', rate: rates.TRY / rates.EUR },
-                        { code: 'GBP/TRY', rate: rates.TRY / rates.GBP },
-                        { code: 'CHF/TRY', rate: rates.TRY / rates.CHF },
-                        { code: 'JPY/TRY', rate: rates.TRY / rates.JPY }
-                    ];
-                    container.innerHTML = currencies.map(c =>
-                        `<div class="currency-item"><div class="code">${c.code}</div><div class="rate">₺${c.rate.toFixed(4)}</div></div>`
-                        ).join('');
-                    localStorage.setItem('currencyBackup', JSON.stringify(currencies));
-                } else {
-                    throw new Error('Veri formatı hatalı');
-                }
+                // data: { USD: { alis, satis, ... }, EUR, GBP, CHF, JPY ... }
+                const currencies = [
+                    { code: 'USD/TRY', rate: data.USD.satis },
+                    { code: 'EUR/TRY', rate: data.EUR.satis },
+                    { code: 'GBP/TRY', rate: data.GBP.satis },
+                    { code: 'CHF/TRY', rate: data.CHF.satis },
+                    { code: 'JPY/TRY', rate: data.JPY.satis }
+                ];
+                container.innerHTML = currencies.map(c =>
+                    `<div class="currency-item"><div class="code">${c.code}</div><div class="rate">₺${c.rate.toFixed(4)}</div></div>`
+                ).join('');
+                localStorage.setItem('currencyBackup', JSON.stringify(currencies));
             } catch (e) {
-                console.error(e);
+                console.error('Döviz hatası:', e);
                 const backup = localStorage.getItem('currencyBackup');
                 if (backup) {
                     try {
                         const parsed = JSON.parse(backup);
                         container.innerHTML = parsed.map(c =>
                             `<div class="currency-item"><div class="code">${c.code}</div><div class="rate">₺${c.rate.toFixed(4)}</div></div>`
-                            ).join('');
+                        ).join('');
                         container.innerHTML +=
                             '<div style="text-align:center;font-size:11px;color:var(--text-secondary);margin-top:8px;">⚠️ Güncel olmayan veri (yedek)</div>';
                     } catch (e2) { showFallbackCurrency(container); }
@@ -1779,7 +1787,7 @@
             ];
             container.innerHTML = fallback.map(c =>
                 `<div class="currency-item"><div class="code">${c.code}</div><div class="rate">₺${c.rate.toFixed(4)}</div></div>`
-                ).join('');
+            ).join('');
             container.innerHTML +=
                 '<div style="text-align:center;font-size:11px;color:#d62828;margin-top:8px;">❌ Güncel veri alınamadı, tahmini değerler</div>';
         }
@@ -1816,6 +1824,22 @@
             const color = localStorage.getItem('accentColor') || '#2d6a4f';
             document.getElementById('accentColor').value = color;
             document.documentElement.style.setProperty('--accent', color);
+        }
+
+        // ================================================================
+        // BUTON STİLLERİ (yuvarlaklık)
+        // ================================================================
+        function applyButtonStyle() {
+            const radius = document.getElementById('btnRadius').value;
+            document.documentElement.style.setProperty('--btn-radius', radius + 'px');
+            document.getElementById('btnRadiusVal').textContent = radius + 'px';
+            localStorage.setItem('btnRadius', radius);
+        }
+
+        function loadButtonStyle() {
+            const radius = localStorage.getItem('btnRadius') || '30';
+            document.getElementById('btnRadius').value = radius;
+            applyButtonStyle();
         }
 
         // ================================================================
@@ -1860,9 +1884,7 @@
             try {
                 const payments = await getAllPayments();
                 const today = new Date();
-                const todayStr = today.toISOString().split('T')[0];
                 const reminderDays = parseInt(document.getElementById('reminderDays').value);
-                const notifTime = document.getElementById('notificationTime').value;
 
                 payments.forEach(p => {
                     if (p.paid) return;
@@ -2087,6 +2109,7 @@
                 await openDB();
                 loadTheme();
                 loadAccentColor();
+                loadButtonStyle();
                 loadNotificationSettings();
 
                 // Kategorileri oluştur
@@ -2122,7 +2145,6 @@
                 }
 
                 await renderSummary();
-                // Arka plan
                 const bg = localStorage.getItem('odemeBgImage');
                 if (bg) {
                     document.getElementById('appBody').style.background = `url(${bg}) center/cover no-repeat fixed`;
