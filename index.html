@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
+        /* ---- AYNI STILLER (Öncekiyle aynı) ---- */
         :root {
             --bg-primary: #f4f6f9;
             --bg-card: rgba(255, 255, 255, 0.85);
@@ -824,7 +825,7 @@
 
             <div class="settings-item">
                 <span class="label">ℹ️ Hakkında</span>
-                <span style="color:var(--text-secondary);">v3.1 • 13 özellik</span>
+                <span style="color:var(--text-secondary);">v3.2 • 13 özellik</span>
             </div>
 
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
@@ -871,7 +872,7 @@
                 <input type="text" id="addNote" placeholder="Örn: TEDAŞ">
                 <div class="btn-group">
                     <button class="btn btn-secondary" onclick="closeAddModal()">İptal</button>
-                    <button class="btn" id="saveAddBtn">💾 Kaydet</button>
+                    <button class="btn" onclick="addPayment()" id="saveAddBtn">💾 Kaydet</button>
                 </div>
             </div>
         </div>
@@ -1103,7 +1104,7 @@
         }
 
         // ================================================================
-        // EKLEME MODAL (DÜZELTİLDİ)
+        // EKLEME MODAL
         // ================================================================
         async function populateCategorySelect(selectId) {
             const categories = await getAllCategories();
@@ -1146,10 +1147,12 @@
         }
 
         // ================================================================
-        // EKLEME İŞLEMİ (KESİN ÇALIŞIR)
+        // EKLEME İŞLEMİ (KESİN ÇALIŞIR - onclick ile)
         // ================================================================
         async function addPayment() {
             try {
+                showToast('⏳ Ödeme kaydediliyor...');
+
                 // 1. Veritabanını kontrol et
                 await getDB();
 
@@ -1189,14 +1192,6 @@
                 showToast('❌ Ödeme eklenirken hata: ' + e.message);
             }
         }
-
-        // ---- Kaydet butonuna event listener (modal açıkken) ----
-        document.addEventListener('DOMContentLoaded', function() {
-            const saveBtn = document.getElementById('saveAddBtn');
-            if (saveBtn) {
-                saveBtn.addEventListener('click', addPayment);
-            }
-        });
 
         // ================================================================
         // ÖZET KARTLARI
@@ -2096,13 +2091,9 @@
 
                 // Kategorileri oluştur
                 const categories = await getAllCategories();
-                if (categories.length === 0 || (categories.length === defaultCategories.length && categories.every((c,
-                        i) => c === defaultCategories[i]))) {
-                    // zaten default var veya hiç yoksa ekle
-                    if (categories.length === 0) {
-                        for (const cat of defaultCategories) {
-                            await addCategoryDB(cat);
-                        }
+                if (categories.length === 0) {
+                    for (const cat of defaultCategories) {
+                        await addCategoryDB(cat);
                     }
                 }
 
