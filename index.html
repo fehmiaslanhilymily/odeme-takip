@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aylık Ödeme Tablosu</title>
+    <title>Ödeme Takip</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
+        /* ===== DEĞİŞKENLER ===== */
         :root {
             --bg-primary: #f4f6f9;
             --bg-card: rgba(255, 255, 255, 0.85);
@@ -18,6 +19,7 @@
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
             --accent: #2d6a4f;
             --btn-radius: 30px;
+            --tab-height: 60px;
             --gradient-start: #667eea;
             --gradient-end: #764ba2;
         }
@@ -64,6 +66,8 @@
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border-color);
+            position: relative;
+            padding-bottom: 80px; /* Tab bar için boşluk */
         }
         .header {
             display: flex;
@@ -95,6 +99,8 @@
             transform: scale(0.9);
             background: rgba(0, 0, 0, 0.1);
         }
+
+        /* ===== BUTONLAR ===== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -134,6 +140,8 @@
             font-size: 12px;
             width: auto;
         }
+
+        /* ===== SAYFALAR ===== */
         .page {
             display: none;
             animation: fadeUp 0.4s ease;
@@ -151,6 +159,8 @@
                 transform: translateY(0);
             }
         }
+
+        /* ===== ÖZET KARTLARI ===== */
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -185,35 +195,8 @@
         .summary-card .value.success {
             color: #2d6a4f;
         }
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 16px 0;
-        }
-        .menu-card {
-            background: var(--bg-glass);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 14px 4px;
-            border-radius: 20px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-primary);
-            font-weight: 500;
-            font-size: 12px;
-        }
-        .menu-card:active {
-            transform: scale(0.92);
-            background: rgba(0, 0, 0, 0.05);
-        }
-        .menu-card span {
-            font-size: 28px;
-            display: block;
-            margin-bottom: 4px;
-        }
+
+        /* ===== LİSTE ÖĞELERİ ===== */
         .payment-item {
             background: var(--bg-glass);
             backdrop-filter: blur(8px);
@@ -281,6 +264,8 @@
         .payment-item .actions button:active {
             background: rgba(0, 0, 0, 0.1);
         }
+
+        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -341,9 +326,11 @@
         .modal-box .btn-group .btn {
             flex: 1;
         }
+
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
-            bottom: 24px;
+            bottom: 90px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--text-primary);
@@ -372,6 +359,7 @@
                 transform: translateX(-50%) scale(1);
             }
         }
+
         .empty {
             color: var(--text-secondary);
             text-align: center;
@@ -390,6 +378,8 @@
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
+
+        /* ===== TAKVİM ===== */
         .calendar {
             background: var(--bg-glass);
             border-radius: 24px;
@@ -469,6 +459,8 @@
             background: var(--accent);
             color: #fff;
         }
+
+        /* ===== GRAFİK ===== */
         .chart-container {
             background: var(--bg-glass);
             border-radius: 20px;
@@ -479,6 +471,8 @@
         .chart-container canvas {
             max-height: 180px;
         }
+
+        /* ===== İSTATİSTİK ===== */
         .stat-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -501,21 +495,8 @@
             font-size: 11px;
             color: var(--text-secondary);
         }
-        .flex {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .mt-10 {
-            margin-top: 10px;
-        }
-        .mb-10 {
-            margin-bottom: 10px;
-        }
-        .w-full {
-            width: 100%;
-        }
+
+        /* ===== AYARLAR ===== */
         .settings-item {
             background: var(--bg-glass);
             backdrop-filter: blur(8px);
@@ -566,6 +547,8 @@
             cursor: pointer;
             display: inline-block;
         }
+
+        /* ===== DÖVİZ ===== */
         .currency-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -589,8 +572,104 @@
             font-weight: 600;
             color: var(--accent);
         }
+
+        /* ===== ALT TAB BAR (iPhone Tarzı) ===== */
+        .tab-bar {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 520px;
+            width: calc(100% - 32px);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 8px 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            z-index: 100;
+        }
+        .tab-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-item {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 500;
+            background: transparent;
+            border: none;
+            min-width: 52px;
+            white-space: nowrap;
+        }
+        .tab-item .tab-icon {
+            font-size: 22px;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        .tab-item .tab-label {
+            font-size: 9px;
+            line-height: 1;
+        }
+        .tab-item.active {
+            color: var(--accent);
+            background: var(--bg-glass);
+        }
+        .tab-item:active {
+            transform: scale(0.92);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            #app {
+                padding: 16px 12px;
+                padding-bottom: 76px;
+                border-radius: 24px;
+            }
+            .tab-bar {
+                bottom: 12px;
+                width: calc(100% - 24px);
+                border-radius: 30px;
+                padding: 6px 8px;
+            }
+            .tab-item {
+                padding: 4px 6px;
+                min-width: 44px;
+            }
+            .tab-item .tab-icon {
+                font-size: 18px;
+            }
+            .tab-item .tab-label {
+                font-size: 8px;
+            }
+            .summary-grid {
+                gap: 8px;
+            }
+            .summary-card .value {
+                font-size: 18px;
+            }
+            .toast {
+                bottom: 80px;
+            }
+        }
+
+        /* Kaydırma çubuğu gizleme */
         ::-webkit-scrollbar {
             width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
@@ -599,40 +678,17 @@
             background: var(--border-color);
             border-radius: 10px;
         }
-        @media (max-width: 480px) {
-            #app {
-                padding: 16px 12px;
-                border-radius: 24px;
-            }
-            .menu-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
-            .menu-card {
-                padding: 12px 2px;
-                font-size: 11px;
-            }
-            .menu-card span {
-                font-size: 24px;
-            }
-            .summary-grid {
-                gap: 8px;
-            }
-            .summary-card .value {
-                font-size: 18px;
-            }
-        }
     </style>
 </head>
 <body id="appBody">
     <div id="app">
         <div class="header">
-            <h1>📆 <span>Ödeme</span> Tablosu</h1>
+            <h1>📆 <span>Ödeme</span> Takip</h1>
             <button class="back-btn" id="globalBackBtn" style="display:none;" onclick="goHome()">✕</button>
         </div>
         <div id="toast" class="toast"></div>
 
-        <!-- ANA SAYFA -->
+        <!-- ===== ANA SAYFA ===== -->
         <div id="page-home" class="page active">
             <div class="summary-grid">
                 <div class="summary-card"><div class="label">Bugün Vadesi Gelen</div><div class="value danger" id="todayTotal">₺0</div></div>
@@ -640,27 +696,18 @@
                 <div class="summary-card"><div class="label">Yaklaşan Toplam</div><div class="value" id="upcomingTotal">₺0</div></div>
                 <div class="summary-card"><div class="label">Bugünkü Ödemeler</div><div class="value success" id="todayPaymentsTotal">₺0</div></div>
             </div>
-
-            <div class="menu-grid">
-                <div class="menu-card" onclick="showPage('page-aylik')"><span>📋</span>Aylık</div>
-                <div class="menu-card" onclick="showPage('page-haftalik')"><span>📅</span>Hafta</div>
-                <div class="menu-card" onclick="showPage('page-gunluk')"><span>📆</span>Bugün</div>
-                <div class="menu-card" onclick="showPage('page-calendar')"><span>🗓️</span>Takvim</div>
-                <div class="menu-card" onclick="showPage('page-charts')"><span>📊</span>Grafikler</div>
-                <div class="menu-card" onclick="showPage('page-stats')"><span>📈</span>İstatistik</div>
-                <div class="menu-card" onclick="showPage('page-categories')"><span>🏷️</span>Kategoriler</div>
-                <div class="menu-card" onclick="showPage('page-currency')"><span>💱</span>Döviz</div>
-                <div class="menu-card" onclick="showPage('page-settings')"><span>⚙️</span>Ayarlar</div>
-            </div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+            <!-- Hızlı erişim butonları (Ödenen, Ödenmeyen, Büyük, Diğer) -->
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
                 <button class="btn btn-sm btn-secondary" onclick="showPage('page-odenmis')" style="flex:1;">✅ Ödenen</button>
                 <button class="btn btn-sm btn-danger" onclick="showPage('page-odenmemis')" style="flex:1;">⏳ Ödenmeyen</button>
                 <button class="btn btn-sm btn-warning" onclick="showPage('page-buyuk')" style="flex:1;">💰 Büyük</button>
                 <button class="btn btn-sm btn-secondary" onclick="showPage('page-diger')" style="flex:1;">📌 Diğer</button>
             </div>
+            <!-- Yeni Ödeme Ekle Butonu -->
+            <button class="btn" onclick="showAddModal()">➕ Yeni Ödeme Ekle</button>
         </div>
 
-        <!-- AYLIK (sadece içinde bulunulan ay, normal kategorisi) -->
+        <!-- ===== DİĞER SAYFALAR (aynı, sadece başlık ve liste) ===== -->
         <div id="page-aylik" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📋 Bu Ayki Normal Ödemeler</h3>
             <input type="text" id="searchInput" placeholder="🔍 Ara..." style="width:100%;padding:10px 14px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-glass);color:var(--text-primary);margin-bottom:12px;">
@@ -669,35 +716,30 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- HAFTALIK (tüm kategoriler) -->
         <div id="page-haftalik" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
             <div id="haftalikList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- GÜNLÜK (tüm kategoriler) -->
         <div id="page-gunluk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
             <div id="gunlukList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ÖDENENLER (normal) -->
         <div id="page-odenmis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
             <div id="odenmisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ÖDENMEYENLER (normal, gecikmiş) -->
         <div id="page-odenmemis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
             <div id="odenmemisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- BÜYÜK (sadece büyük kategorisi) -->
         <div id="page-buyuk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💰 Büyük Ödemeler</h3>
             <div class="total-box" id="buyukTotal">Toplam: ₺0</div>
@@ -706,7 +748,6 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- DİĞER (sadece diğer kategorisi) -->
         <div id="page-diger" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📌 Diğer Ödemeler</h3>
             <div class="total-box" id="digerTotal">Toplam: ₺0</div>
@@ -715,7 +756,6 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- TAKVİM -->
         <div id="page-calendar" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">🗓️ Takvim</h3>
             <div class="calendar" id="calendarContainer">
@@ -733,7 +773,6 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- GRAFİKLER -->
         <div id="page-charts" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📊 Grafikler</h3>
             <div class="chart-container"><canvas id="chart30days"></canvas></div>
@@ -743,14 +782,12 @@
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- İSTATİSTİK -->
         <div id="page-stats" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📈 İstatistikler</h3>
             <div class="stat-grid" id="statsGrid"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- KATEGORİLER -->
         <div id="page-categories" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">🏷️ Kategoriler</h3>
             <div id="categoryList" style="margin-bottom:12px;"></div>
@@ -761,7 +798,6 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- DÖVİZ (Genelpara.com API) -->
         <div id="page-currency" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:var(--text-secondary);">(Genelpara.com)</small></h3>
             <div id="currencyList" class="currency-grid"></div>
@@ -769,10 +805,9 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- AYARLAR -->
         <div id="page-settings" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:16px;">⚙️ Ayarlar</h3>
-
+            <!-- Ayarlar içeriği (kısaltılmış) -->
             <div class="settings-item">
                 <span class="label">🌓 Tema</span>
                 <select id="themeSelect" onchange="applyTheme()">
@@ -790,7 +825,6 @@
                 <input type="range" id="btnRadius" min="0" max="50" value="30" oninput="applyButtonStyle()">
                 <span id="btnRadiusVal">30px</span>
             </div>
-
             <div class="settings-item">
                 <span class="label">🔔 Bildirimler</span>
                 <select id="notificationSelect" onchange="toggleNotifications()">
@@ -814,34 +848,36 @@
                     <option value="-1">Gecikti</option>
                 </select>
             </div>
-
             <div class="settings-item">
                 <span class="label">📤 Dışa Aktar</span>
                 <button class="btn btn-sm" onclick="exportData('json')" style="width:auto;">JSON</button>
                 <button class="btn btn-sm" onclick="exportData('csv')" style="width:auto;">CSV</button>
             </div>
-
             <div class="settings-item">
                 <span class="label">📥 Yedekten Geri Yükle</span>
                 <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="restoreData(event)">
                 <button class="btn btn-sm file-label" onclick="document.getElementById('restoreFileInput').click()">📁 Dosya Seç</button>
                 <span style="font-size:11px;color:var(--text-secondary);width:100%;">Web'deki verileri telefonda görmek için dışa aktarıp buradan yükleyin.</span>
             </div>
-
+            <div class="settings-item">
+                <span class="label">🖼️ Arka Plan Görseli</span>
+                <button class="btn btn-sm file-label" onclick="document.getElementById('bgImageInput').click()">📁 Galeriden Seç</button>
+                <input type="file" id="bgImageInput" accept="image/*" style="display:none;" onchange="handleBgImage(event)">
+                <button class="btn btn-sm btn-danger" onclick="removeBgImage()" style="width:auto;">Kaldır</button>
+            </div>
+            <div id="bgPreview" style="display:none; margin-bottom:10px;"><img id="bgPreviewImg" style="width:100%; max-height:100px; object-fit:cover; border-radius:12px;"></div>
             <div class="settings-item">
                 <span class="label">🗑️ Tüm Verileri Sil</span>
                 <button class="btn btn-sm btn-danger" onclick="clearAllData()">Sil</button>
             </div>
-
             <div class="settings-item">
                 <span class="label">ℹ️ Hakkında</span>
-                <span style="color:var(--text-secondary);">v3.3 • 13 özellik</span>
+                <span style="color:var(--text-secondary);">v5.0 • iPhone Tab Bar</span>
             </div>
-
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- EKLEME MODAL -->
+        <!-- ===== MODALLAR (Ekleme ve Düzenleme) ===== -->
         <div class="modal-overlay" id="addModal">
             <div class="modal-box">
                 <h2 id="addModalTitle">➕ Yeni Ödeme</h2>
@@ -887,7 +923,6 @@
             </div>
         </div>
 
-        <!-- DÜZENLEME MODAL -->
         <div class="modal-overlay" id="editModal">
             <div class="modal-box">
                 <h2>✏️ Ödeme Düzenle</h2>
@@ -934,21 +969,53 @@
         </div>
     </div>
 
+    <!-- ===== ALT TAB BAR (iPhone Tarzı) ===== -->
+    <div class="tab-bar" id="tabBar">
+        <button class="tab-item active" data-page="page-home" onclick="navigateTo('page-home')">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">Ana</span>
+        </button>
+        <button class="tab-item" data-page="page-aylik" onclick="navigateTo('page-aylik')">
+            <span class="tab-icon">📋</span>
+            <span class="tab-label">Aylık</span>
+        </button>
+        <button class="tab-item" data-page="page-haftalik" onclick="navigateTo('page-haftalik')">
+            <span class="tab-icon">📅</span>
+            <span class="tab-label">Hafta</span>
+        </button>
+        <button class="tab-item" data-page="page-gunluk" onclick="navigateTo('page-gunluk')">
+            <span class="tab-icon">📆</span>
+            <span class="tab-label">Bugün</span>
+        </button>
+        <button class="tab-item" data-page="page-calendar" onclick="navigateTo('page-calendar')">
+            <span class="tab-icon">🗓️</span>
+            <span class="tab-label">Takvim</span>
+        </button>
+        <button class="tab-item" data-page="page-charts" onclick="navigateTo('page-charts')">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">Grafik</span>
+        </button>
+        <button class="tab-item" data-page="page-stats" onclick="navigateTo('page-stats')">
+            <span class="tab-icon">📈</span>
+            <span class="tab-label">İstatistik</span>
+        </button>
+        <button class="tab-item" data-page="page-categories" onclick="navigateTo('page-categories')">
+            <span class="tab-icon">🏷️</span>
+            <span class="tab-label">Kategoriler</span>
+        </button>
+        <button class="tab-item" data-page="page-currency" onclick="navigateTo('page-currency')">
+            <span class="tab-icon">💱</span>
+            <span class="tab-label">Döviz</span>
+        </button>
+        <button class="tab-item" data-page="page-settings" onclick="navigateTo('page-settings')">
+            <span class="tab-icon">⚙️</span>
+            <span class="tab-label">Ayarlar</span>
+        </button>
+    </div>
+
     <script>
         // ================================================================
-        // PARA BİRİMİ FORMATI
-        // ================================================================
-        function formatCurrency(amount, currency = 'TRY') {
-            const symbols = { TRY: '₺', USD: '$', EUR: '€', GBP: '£', CHF: 'CHF' };
-            const symbol = symbols[currency] || '₺';
-            if (isNaN(amount) || amount === null || amount === undefined) return symbol + '0,00';
-            const num = parseFloat(amount);
-            if (num === 0) return symbol + '0,00';
-            return symbol + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.').replace('.', ',');
-        }
-
-        // ================================================================
-        // VERİTABANI (IndexedDB)
+        // VERİTABANI (IndexedDB) - KISALTILMIŞ (ÖNCEKİYLE AYNI)
         // ================================================================
         const DB_NAME = 'OdemeDB';
         const STORE_NAME = 'odemeler';
@@ -957,7 +1024,7 @@
 
         function openDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, 6);
+                const request = indexedDB.open(DB_NAME, 7);
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE_NAME)) {
@@ -1073,8 +1140,17 @@
         }
 
         // ================================================================
-        // TOAST
+        // YARDIMCI FONKSİYONLAR
         // ================================================================
+        function formatCurrency(amount, currency = 'TRY') {
+            const symbols = { TRY: '₺', USD: '$', EUR: '€', GBP: '£', CHF: 'CHF' };
+            const symbol = symbols[currency] || '₺';
+            if (isNaN(amount) || amount === null || amount === undefined) return symbol + '0,00';
+            const num = parseFloat(amount);
+            if (num === 0) return symbol + '0,00';
+            return symbol + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.').replace('.', ',');
+        }
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -1084,113 +1160,47 @@
         }
 
         // ================================================================
-        // SAYFA YÖNETİMİ
+        // SAYFA YÖNETİMİ (Tab Bar ile)
         // ================================================================
-        function goHome() {
+        function navigateTo(pageId) {
+            // Sayfayı göster
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-home').classList.add('active');
-            document.getElementById('globalBackBtn').style.display = 'none';
-            renderSummary();
-            updateCharts();
-        }
+            document.getElementById(pageId).classList.add('active');
 
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById('globalBackBtn').style.display = 'block';
-            if (id === 'page-aylik') renderAylik();
-            else if (id === 'page-haftalik') renderHaftalik();
-            else if (id === 'page-gunluk') renderGunluk();
-            else if (id === 'page-odenmis') renderOdenenler();
-            else if (id === 'page-odenmemis') renderOdenmeyenler();
-            else if (id === 'page-buyuk') renderBuyuk();
-            else if (id === 'page-diger') renderDiger();
-            else if (id === 'page-calendar') renderCalendar();
-            else if (id === 'page-charts') updateCharts();
-            else if (id === 'page-stats') renderStats();
-            else if (id === 'page-categories') renderCategories();
-            else if (id === 'page-currency') fetchCurrency();
-        }
+            // Tab bar'daki aktif öğeyi güncelle
+            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            const activeTab = document.querySelector(`.tab-item[data-page="${pageId}"]`);
+            if (activeTab) activeTab.classList.add('active');
 
-        // ================================================================
-        // EKLEME MODAL
-        // ================================================================
-        async function populateCategorySelect(selectId) {
-            const categories = await getAllCategories();
-            const sel = document.getElementById(selectId);
-            if (!sel) return;
-            const current = sel.value;
-            sel.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
-            if (categories.includes(current)) sel.value = current;
-        }
+            // Geri butonunu göster/gizle (ana sayfa değilse)
+            document.getElementById('globalBackBtn').style.display = (pageId === 'page-home') ? 'none' : 'block';
 
-        async function showAddModal() {
-            try {
-                await populateCategorySelect('addCategorySelect');
-                document.getElementById('addModal').classList.add('active');
-                document.getElementById('addModalTitle').textContent = '➕ Yeni Ödeme';
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('addDate').value = today;
-                document.getElementById('addCategorySelect').disabled = false;
-            } catch (e) {
-                showToast('❌ Kategoriler yüklenirken hata: ' + e.message);
-            }
-        }
-
-        function showAddModalWithCategory(category) {
-            document.getElementById('addModal').classList.add('active');
-            document.getElementById('addCategorySelect').value = category;
-            document.getElementById('addModalTitle').textContent = category === 'buyuk' ? '💰 Yeni Büyük Ödeme' : '📌 Yeni Diğer Ödeme';
-            document.getElementById('addCategorySelect').disabled = true;
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('addDate').value = today;
-        }
-
-        function closeAddModal() {
-            document.getElementById('addModal').classList.remove('active');
-            document.getElementById('addCategorySelect').disabled = false;
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('active');
-        }
-
-        // ================================================================
-        // EKLEME İŞLEMİ
-        // ================================================================
-        async function addPayment() {
-            try {
-                showToast('⏳ Ödeme kaydediliyor...');
-                await getDB();
-
-                const name = document.getElementById('addName').value.trim();
-                const amount = parseFloat(document.getElementById('addAmount').value);
-                const date = document.getElementById('addDate').value;
-                const period = document.getElementById('addPeriod').value;
-                const category = document.getElementById('addCategorySelect').value || 'normal';
-                const note = document.getElementById('addNote').value.trim();
-                const currency = document.getElementById('addCurrency').value;
-                const recurrence = document.getElementById('addRecurrence').value;
-
-                if (!name) { showToast('❌ Ad zorunlu'); return; }
-                if (isNaN(amount) || amount <= 0) { showToast('❌ Geçerli tutar girin'); return; }
-                if (!date) { showToast('❌ Tarih seçin'); return; }
-
-                await addPaymentDB({ name, amount, date, period, category, note, paid: false, currency, recurrence });
-                showToast('✅ Ödeme eklendi');
-                closeAddModal();
-
-                document.getElementById('addName').value = '';
-                document.getElementById('addAmount').value = '';
-                document.getElementById('addNote').value = '';
-
-                await renderSummary();
-                refreshCurrentPage();
+            // Sayfa içeriğini render et
+            if (pageId === 'page-aylik') renderAylik();
+            else if (pageId === 'page-haftalik') renderHaftalik();
+            else if (pageId === 'page-gunluk') renderGunluk();
+            else if (pageId === 'page-odenmis') renderOdenenler();
+            else if (pageId === 'page-odenmemis') renderOdenmeyenler();
+            else if (pageId === 'page-buyuk') renderBuyuk();
+            else if (pageId === 'page-diger') renderDiger();
+            else if (pageId === 'page-calendar') renderCalendar();
+            else if (pageId === 'page-charts') updateCharts();
+            else if (pageId === 'page-stats') renderStats();
+            else if (pageId === 'page-categories') renderCategories();
+            else if (pageId === 'page-currency') fetchCurrency();
+            else if (pageId === 'page-home') {
+                renderSummary();
                 updateCharts();
-            } catch (e) {
-                console.error('Ekleme hatası:', e);
-                showToast('❌ Ödeme eklenirken hata: ' + e.message);
             }
+        }
+
+        // Eski showPage'i koru (butonlar için)
+        function showPage(pageId) {
+            navigateTo(pageId);
+        }
+
+        function goHome() {
+            navigateTo('page-home');
         }
 
         // ================================================================
@@ -1202,13 +1212,11 @@
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 const todayStr = today.toISOString().split('T')[0];
-
                 let todayTotal = 0,
                     overdueTotal = 0,
                     upcomingTotal = 0,
                     todayPaymentsTotal = 0;
                 const normalPayments = payments.filter(p => p.category === 'normal' || !p.category);
-
                 normalPayments.forEach(p => {
                     const pDate = new Date(p.date + 'T00:00:00');
                     const amount = parseFloat(p.amount) || 0;
@@ -1222,7 +1230,6 @@
                         todayPaymentsTotal += amount;
                     } else upcomingTotal += amount;
                 });
-
                 document.getElementById('todayTotal').textContent = formatCurrency(todayTotal);
                 document.getElementById('overdueTotal').textContent = formatCurrency(overdueTotal);
                 document.getElementById('upcomingTotal').textContent = formatCurrency(upcomingTotal);
@@ -1241,10 +1248,8 @@
             if (p.paid) badge = '<span class="badge odendi">Ödendi</span>';
             else if (isOverdue) badge = '<span class="badge gecikmis">Gecikmiş</span>';
             else if (isToday) badge = '<span class="badge" style="background:rgba(255,215,0,0.2);color:#ffd700;">Bugün</span>';
-
             const currency = p.currency || 'TRY';
             const amountStr = formatCurrency(p.amount, currency);
-
             return `
                 <div class="payment-item">
                     <div class="info">
@@ -1273,7 +1278,6 @@
                 const currentMonth = now.getMonth();
                 const currentYear = now.getFullYear();
                 const search = document.getElementById('searchInput').value.toLowerCase();
-
                 const filtered = payments.filter(p => {
                     const pDate = new Date(p.date + 'T00:00:00');
                     return (p.category === 'normal' || !p.category) &&
@@ -1285,7 +1289,6 @@
                             (p.amount || '').toString().includes(search) ||
                             (p.currency || '').toLowerCase().includes(search));
                 }).sort((a, b) => new Date(a.date) - new Date(b.date));
-
                 const container = document.getElementById('aylikList');
                 if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bu ay normal ödeme yok</div>'; return; }
                 container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
@@ -1293,7 +1296,7 @@
         }
 
         // ================================================================
-        // DİĞER LİSTELER (haftalık, günlük, ödenen, ödenmeyen, büyük, diğer)
+        // DİĞER LİSTELER (KISALTILMIŞ - ÖNCEKİYLE AYNI)
         // ================================================================
         async function renderHaftalik() {
             try {
@@ -1397,26 +1400,112 @@
                 await updatePaymentDB(p);
                 showToast(p.paid ? '✅ Ödendi' : '↩️ Ödenmedi');
                 await renderSummary();
-                refreshCurrentPage();
+                // Mevcut sayfayı yenile
+                const activePage = document.querySelector('.page.active');
+                if (activePage) {
+                    const id = activePage.id;
+                    if (id === 'page-aylik') renderAylik();
+                    else if (id === 'page-haftalik') renderHaftalik();
+                    else if (id === 'page-gunluk') renderGunluk();
+                    else if (id === 'page-odenmis') renderOdenenler();
+                    else if (id === 'page-odenmemis') renderOdenmeyenler();
+                    else if (id === 'page-buyuk') renderBuyuk();
+                    else if (id === 'page-diger') renderDiger();
+                    else if (id === 'page-calendar') renderCalendar();
+                    else if (id === 'page-stats') renderStats();
+                }
             } catch (e) {
                 console.error(e);
                 showToast('❌ Hata: ' + e.message);
             }
         }
 
-        function refreshCurrentPage() {
-            const active = document.querySelector('.page.active');
-            if (active) {
-                const id = active.id;
-                if (id === 'page-aylik') renderAylik();
-                else if (id === 'page-haftalik') renderHaftalik();
-                else if (id === 'page-gunluk') renderGunluk();
-                else if (id === 'page-odenmis') renderOdenenler();
-                else if (id === 'page-odenmemis') renderOdenmeyenler();
-                else if (id === 'page-buyuk') renderBuyuk();
-                else if (id === 'page-diger') renderDiger();
-                else if (id === 'page-calendar') renderCalendar();
-                else if (id === 'page-stats') renderStats();
+        // ================================================================
+        // MODAL VE EKLEME
+        // ================================================================
+        async function populateCategorySelect(selectId) {
+            const categories = await getAllCategories();
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            const current = sel.value;
+            sel.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            if (categories.includes(current)) sel.value = current;
+        }
+
+        async function showAddModal() {
+            try {
+                await populateCategorySelect('addCategorySelect');
+                document.getElementById('addModal').classList.add('active');
+                document.getElementById('addModalTitle').textContent = '➕ Yeni Ödeme';
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('addDate').value = today;
+                document.getElementById('addCategorySelect').disabled = false;
+            } catch (e) {
+                showToast('❌ Kategoriler yüklenirken hata: ' + e.message);
+            }
+        }
+
+        function showAddModalWithCategory(category) {
+            document.getElementById('addModal').classList.add('active');
+            document.getElementById('addCategorySelect').value = category;
+            document.getElementById('addModalTitle').textContent = category === 'buyuk' ? '💰 Yeni Büyük Ödeme' : '📌 Yeni Diğer Ödeme';
+            document.getElementById('addCategorySelect').disabled = true;
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('addDate').value = today;
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+            document.getElementById('addCategorySelect').disabled = false;
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // ================================================================
+        // EKLEME İŞLEMİ
+        // ================================================================
+        async function addPayment() {
+            try {
+                showToast('⏳ Ödeme kaydediliyor...');
+                await getDB();
+                const name = document.getElementById('addName').value.trim();
+                const amount = parseFloat(document.getElementById('addAmount').value);
+                const date = document.getElementById('addDate').value;
+                const period = document.getElementById('addPeriod').value;
+                const category = document.getElementById('addCategorySelect').value || 'normal';
+                const note = document.getElementById('addNote').value.trim();
+                const currency = document.getElementById('addCurrency').value;
+                const recurrence = document.getElementById('addRecurrence').value;
+                if (!name) { showToast('❌ Ad zorunlu'); return; }
+                if (isNaN(amount) || amount <= 0) { showToast('❌ Geçerli tutar girin'); return; }
+                if (!date) { showToast('❌ Tarih seçin'); return; }
+                await addPaymentDB({ name, amount, date, period, category, note, paid: false, currency, recurrence });
+                showToast('✅ Ödeme eklendi');
+                closeAddModal();
+                document.getElementById('addName').value = '';
+                document.getElementById('addAmount').value = '';
+                document.getElementById('addNote').value = '';
+                await renderSummary();
+                // Aktif sayfayı yenile
+                const activePage = document.querySelector('.page.active');
+                if (activePage) {
+                    const id = activePage.id;
+                    if (id === 'page-aylik') renderAylik();
+                    else if (id === 'page-haftalik') renderHaftalik();
+                    else if (id === 'page-gunluk') renderGunluk();
+                    else if (id === 'page-odenmis') renderOdenenler();
+                    else if (id === 'page-odenmemis') renderOdenmeyenler();
+                    else if (id === 'page-buyuk') renderBuyuk();
+                    else if (id === 'page-diger') renderDiger();
+                    else if (id === 'page-calendar') renderCalendar();
+                    else if (id === 'page-stats') renderStats();
+                    else if (id === 'page-charts') updateCharts();
+                }
+            } catch (e) {
+                console.error('Ekleme hatası:', e);
+                showToast('❌ Ödeme eklenirken hata: ' + e.message);
             }
         }
 
@@ -1457,11 +1546,9 @@
                 const note = document.getElementById('editNote').value.trim();
                 const currency = document.getElementById('editCurrency').value;
                 const recurrence = document.getElementById('editRecurrence').value;
-
                 if (!name) { showToast('❌ Ad zorunlu'); return; }
                 if (isNaN(amount) || amount <= 0) { showToast('❌ Geçerli tutar girin'); return; }
                 if (!date) { showToast('❌ Tarih seçin'); return; }
-
                 const payments = await getAllPayments();
                 const existing = payments.find(p => p.id === editingId);
                 if (!existing) return;
@@ -1470,8 +1557,20 @@
                 showToast('✅ Ödeme güncellendi');
                 closeEditModal();
                 await renderSummary();
-                refreshCurrentPage();
-                updateCharts();
+                const activePage = document.querySelector('.page.active');
+                if (activePage) {
+                    const id = activePage.id;
+                    if (id === 'page-aylik') renderAylik();
+                    else if (id === 'page-haftalik') renderHaftalik();
+                    else if (id === 'page-gunluk') renderGunluk();
+                    else if (id === 'page-odenmis') renderOdenenler();
+                    else if (id === 'page-odenmemis') renderOdenmeyenler();
+                    else if (id === 'page-buyuk') renderBuyuk();
+                    else if (id === 'page-diger') renderDiger();
+                    else if (id === 'page-calendar') renderCalendar();
+                    else if (id === 'page-stats') renderStats();
+                    else if (id === 'page-charts') updateCharts();
+                }
             } catch (e) {
                 console.error(e);
                 showToast('❌ Hata: ' + e.message);
@@ -1487,8 +1586,20 @@
                 await deletePaymentDB(id);
                 showToast('🗑️ Ödeme silindi');
                 await renderSummary();
-                refreshCurrentPage();
-                updateCharts();
+                const activePage = document.querySelector('.page.active');
+                if (activePage) {
+                    const id = activePage.id;
+                    if (id === 'page-aylik') renderAylik();
+                    else if (id === 'page-haftalik') renderHaftalik();
+                    else if (id === 'page-gunluk') renderGunluk();
+                    else if (id === 'page-odenmis') renderOdenenler();
+                    else if (id === 'page-odenmemis') renderOdenmeyenler();
+                    else if (id === 'page-buyuk') renderBuyuk();
+                    else if (id === 'page-diger') renderDiger();
+                    else if (id === 'page-calendar') renderCalendar();
+                    else if (id === 'page-stats') renderStats();
+                    else if (id === 'page-charts') updateCharts();
+                }
             } catch (e) {
                 console.error(e);
                 showToast('❌ Hata: ' + e.message);
@@ -1506,30 +1617,25 @@
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const today = new Date();
-
             const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim',
                 'Kasım', 'Aralık'
             ];
             document.getElementById('calendarMonthYear').textContent = monthNames[month] + ' ' + year;
-
             const payments = await getAllPayments();
             const grid = document.getElementById('calendarDays');
             grid.innerHTML = '';
-
             const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
             for (let i = 0; i < startOffset; i++) {
                 const empty = document.createElement('div');
                 empty.className = 'calendar-day other-month';
                 grid.appendChild(empty);
             }
-
             for (let d = 1; d <= daysInMonth; d++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'calendar-day';
                 const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
                 const isToday = dateStr === today.toISOString().split('T')[0];
                 if (isToday) dayDiv.classList.add('today');
-
                 const dayPayments = payments.filter(p => p.date === dateStr);
                 let hasOverdue = false,
                     hasUpcoming = false,
@@ -1539,16 +1645,13 @@
                     else if (p.date < today.toISOString().split('T')[0]) hasOverdue = true;
                     else hasUpcoming = true;
                 });
-
                 const dot = document.createElement('div');
                 dot.className = 'dot';
                 if (hasOverdue) dot.classList.add('red');
                 else if (hasUpcoming) dot.classList.add('yellow');
                 else if (hasPaid) dot.classList.add('green');
-
                 dayDiv.textContent = d;
                 dayDiv.appendChild(dot);
-
                 dayDiv.addEventListener('click', () => showDayDetail(dateStr, dayPayments));
                 grid.appendChild(dayDiv);
             }
@@ -1593,7 +1696,6 @@
                     amounts.push(sum);
                 }
                 createChart('chart30days', 'Son 30 Gün', dates, amounts, 'line', '#2d6a4f');
-
                 const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
                 const months = [];
                 const monthlyTotals = [];
@@ -1606,7 +1708,6 @@
                     monthlyTotals.push(sum);
                 }
                 createChart('chartMonthly', 'Aylık Gider (Son 6 Ay)', months, monthlyTotals, 'bar', '#457b9d');
-
                 const catMap = {};
                 payments.forEach(p => {
                     const cat = p.category || 'normal';
@@ -1617,7 +1718,6 @@
                 createChart('chartCategory', 'Kategori Dağılımı', catLabels, catValues, 'pie', ['#2d6a4f', '#457b9d',
                     '#d62828', '#f4a261', '#6c757d', '#ffd700'
                 ]);
-
                 const last12 = [];
                 const last12Totals = [];
                 for (let i = 11; i >= 0; i--) {
@@ -1686,7 +1786,6 @@
                 });
                 const topMonth = Object.keys(monthMap).reduce((a, b) => monthMap[a] > monthMap[b] ? a : b, '');
                 const firmCount = Object.keys(firmMap).length;
-
                 const stats = [
                     { label: 'Toplam İşlem', value: total },
                     { label: 'Toplam Gider', value: formatCurrency(totalAmount) },
@@ -1699,7 +1798,7 @@
                 ];
                 document.getElementById('statsGrid').innerHTML = stats.map(s =>
                     `<div class="stat-card"><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>`
-                    ).join('');
+                ).join('');
             } catch (e) { showToast('❌ İstatistik yüklenirken hata: ' + e.message); }
         }
 
@@ -1740,7 +1839,7 @@
         }
 
         // ================================================================
-        // DÖVİZ KURLARI (Genelpara.com - Türkiye)
+        // DÖVİZ KURLARI (Genelpara.com)
         // ================================================================
         async function fetchCurrency() {
             const container = document.getElementById('currencyList');
@@ -1749,7 +1848,6 @@
                 const res = await fetch('https://api.genelpara.com/embed/doviz.json');
                 if (!res.ok) throw new Error('API yanıt vermedi');
                 const data = await res.json();
-                // data: { USD: { alis, satis, ... }, EUR, GBP, CHF, JPY ... }
                 const currencies = [
                     { code: 'USD/TRY', rate: data.USD.satis },
                     { code: 'EUR/TRY', rate: data.EUR.satis },
@@ -1793,7 +1891,7 @@
         }
 
         // ================================================================
-        // TEMA
+        // TEMA VE STİLLER
         // ================================================================
         function applyTheme() {
             const theme = document.getElementById('themeSelect').value;
@@ -1826,9 +1924,6 @@
             document.documentElement.style.setProperty('--accent', color);
         }
 
-        // ================================================================
-        // BUTON STİLLERİ (yuvarlaklık)
-        // ================================================================
         function applyButtonStyle() {
             const radius = document.getElementById('btnRadius').value;
             document.documentElement.style.setProperty('--btn-radius', radius + 'px');
@@ -1840,6 +1935,46 @@
             const radius = localStorage.getItem('btnRadius') || '30';
             document.getElementById('btnRadius').value = radius;
             applyButtonStyle();
+        }
+
+        // ================================================================
+        // ARKA PLAN GÖRSELİ
+        // ================================================================
+        function loadBackground() {
+            const data = localStorage.getItem('odemeBgImage');
+            if (data) {
+                document.getElementById('appBody').style.background = `url(${data}) center/cover no-repeat fixed`;
+                document.getElementById('bgPreviewImg').src = data;
+                document.getElementById('bgPreview').style.display = 'block';
+            }
+        }
+
+        function handleBgImage(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('❌ Resim 5MB\'dan küçük olmalı');
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const data = ev.target.result;
+                localStorage.setItem('odemeBgImage', data);
+                document.getElementById('appBody').style.background = `url(${data}) center/cover no-repeat fixed`;
+                document.getElementById('bgPreviewImg').src = data;
+                document.getElementById('bgPreview').style.display = 'block';
+                showToast('✅ Arka plan güncellendi');
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        }
+
+        function removeBgImage() {
+            localStorage.removeItem('odemeBgImage');
+            document.getElementById('appBody').style.background = '';
+            document.getElementById('bgPreview').style.display = 'none';
+            showToast('🗑️ Arka plan kaldırıldı');
         }
 
         // ================================================================
@@ -1885,7 +2020,6 @@
                 const payments = await getAllPayments();
                 const today = new Date();
                 const reminderDays = parseInt(document.getElementById('reminderDays').value);
-
                 payments.forEach(p => {
                     if (p.paid) return;
                     const pDate = new Date(p.date + 'T00:00:00');
@@ -1929,7 +2063,7 @@
         }
 
         // ================================================================
-        // DIŞA AKTAR
+        // DIŞA AKTAR / YEDEKLEME
         // ================================================================
         async function exportData(format) {
             const payments = await getAllPayments();
@@ -1958,9 +2092,6 @@
             showToast(`✅ ${format.toUpperCase()} dışa aktarıldı`);
         }
 
-        // ================================================================
-        // YEDEKTEN GERİ YÜKLE
-        // ================================================================
         async function restoreData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1980,8 +2111,20 @@
                 await new Promise((resolve) => tx.oncomplete = resolve);
                 showToast('✅ Yedek geri yüklendi');
                 await renderSummary();
-                refreshCurrentPage();
-                updateCharts();
+                const activePage = document.querySelector('.page.active');
+                if (activePage) {
+                    const id = activePage.id;
+                    if (id === 'page-aylik') renderAylik();
+                    else if (id === 'page-haftalik') renderHaftalik();
+                    else if (id === 'page-gunluk') renderGunluk();
+                    else if (id === 'page-odenmis') renderOdenenler();
+                    else if (id === 'page-odenmemis') renderOdenmeyenler();
+                    else if (id === 'page-buyuk') renderBuyuk();
+                    else if (id === 'page-diger') renderDiger();
+                    else if (id === 'page-calendar') renderCalendar();
+                    else if (id === 'page-stats') renderStats();
+                    else if (id === 'page-charts') updateCharts();
+                }
                 event.target.value = '';
             } catch (e) {
                 showToast('❌ Yedek yükleme hatası: ' + e.message);
@@ -2002,8 +2145,20 @@
                 await new Promise((resolve) => tx.oncomplete = resolve);
                 showToast('🗑️ Tüm veriler silindi');
                 await renderSummary();
-                refreshCurrentPage();
-                updateCharts();
+                const activePage = document.querySelector('.page.active');
+                if (activePage) {
+                    const id = activePage.id;
+                    if (id === 'page-aylik') renderAylik();
+                    else if (id === 'page-haftalik') renderHaftalik();
+                    else if (id === 'page-gunluk') renderGunluk();
+                    else if (id === 'page-odenmis') renderOdenenler();
+                    else if (id === 'page-odenmemis') renderOdenmeyenler();
+                    else if (id === 'page-buyuk') renderBuyuk();
+                    else if (id === 'page-diger') renderDiger();
+                    else if (id === 'page-calendar') renderCalendar();
+                    else if (id === 'page-stats') renderStats();
+                    else if (id === 'page-charts') updateCharts();
+                }
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
@@ -2111,6 +2266,7 @@
                 loadAccentColor();
                 loadButtonStyle();
                 loadNotificationSettings();
+                loadBackground();
 
                 // Kategorileri oluştur
                 const categories = await getAllCategories();
@@ -2145,14 +2301,8 @@
                 }
 
                 await renderSummary();
-                const bg = localStorage.getItem('odemeBgImage');
-                if (bg) {
-                    document.getElementById('appBody').style.background = `url(${bg}) center/cover no-repeat fixed`;
-                }
-
                 await processRecurringPayments();
                 setInterval(processRecurringPayments, 86400000);
-
                 fetchCurrency();
             } catch (e) {
                 console.error(e);
