@@ -19,9 +19,16 @@
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
             --accent: #2d6a4f;
             --btn-radius: 30px;
-            --tab-height: 70px;
-            --tab-icon-size: 24px;
-            --tab-label-size: 11px;
+
+            --tab-height: 76px;
+            --tab-icon-size: 26px;
+            --tab-label-size: 12px;
+            --tab-min-width: 68px;
+            --tab-padding: 10px 16px;
+            --tab-active-color: #2d6a4f;
+            --tab-passive-color: #6c757d;
+            --tab-active-bg: rgba(45, 106, 79, 0.12);
+            --tab-passive-bg: transparent;
         }
         [data-theme="dark"] {
             --bg-primary: #121212;
@@ -33,6 +40,9 @@
             --border-color: rgba(255, 255, 255, 0.05);
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
             --accent: #4caf50;
+            --tab-active-color: #4caf50;
+            --tab-passive-color: #a0a0b0;
+            --tab-active-bg: rgba(76, 175, 80, 0.15);
         }
         * {
             box-sizing: border-box;
@@ -65,7 +75,7 @@
             flex-direction: column;
             border: 1px solid var(--border-color);
             position: relative;
-            padding-bottom: 90px;
+            padding-bottom: 100px;
         }
         .header {
             display: flex;
@@ -97,6 +107,8 @@
             transform: scale(0.9);
             background: rgba(0, 0, 0, 0.1);
         }
+
+        /* ===== BUTONLAR ===== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -136,6 +148,18 @@
             font-size: 12px;
             width: auto;
         }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            box-shadow: none;
+        }
+        .btn-outline:active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* ===== SAYFALAR ===== */
         .page {
             display: none;
             animation: fadeUp 0.4s ease;
@@ -153,6 +177,8 @@
                 transform: translateY(0);
             }
         }
+
+        /* ===== ÖZET KARTLARI ===== */
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -187,6 +213,11 @@
         .summary-card .value.success {
             color: #2d6a4f;
         }
+        .summary-card .value.warning {
+            color: #f4a261;
+        }
+
+        /* ===== LİSTE ÖĞELERİ ===== */
         .payment-item {
             background: var(--bg-glass);
             backdrop-filter: blur(8px);
@@ -236,6 +267,10 @@
             background: rgba(214, 40, 40, 0.2);
             color: #d62828;
         }
+        .payment-item .info .badge.bugun {
+            background: rgba(244, 162, 97, 0.2);
+            color: #f4a261;
+        }
         .payment-item .actions {
             display: flex;
             gap: 4px;
@@ -254,6 +289,11 @@
         .payment-item .actions button:active {
             background: rgba(0, 0, 0, 0.1);
         }
+        .payment-item .actions .pay-btn {
+            font-size: 20px;
+        }
+
+        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -314,9 +354,11 @@
         .modal-box .btn-group .btn {
             flex: 1;
         }
+
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
-            bottom: 100px;
+            bottom: 110px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--text-primary);
@@ -345,6 +387,7 @@
                 transform: translateX(-50%) scale(1);
             }
         }
+
         .empty {
             color: var(--text-secondary);
             text-align: center;
@@ -363,6 +406,8 @@
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
+
+        /* ===== TAKVİM ===== */
         .calendar {
             background: var(--bg-glass);
             border-radius: 24px;
@@ -442,6 +487,8 @@
             background: var(--accent);
             color: #fff;
         }
+
+        /* ===== GRAFİK ===== */
         .chart-container {
             background: var(--bg-glass);
             border-radius: 20px;
@@ -452,6 +499,8 @@
         .chart-container canvas {
             max-height: 180px;
         }
+
+        /* ===== İSTATİSTİK ===== */
         .stat-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -474,6 +523,8 @@
             font-size: 11px;
             color: var(--text-secondary);
         }
+
+        /* ===== AYARLAR ===== */
         .settings-item {
             background: var(--bg-glass);
             backdrop-filter: blur(8px);
@@ -491,6 +542,7 @@
             flex: 1;
             min-width: 100px;
             color: var(--text-primary);
+            font-size: 14px;
         }
         .settings-item input[type="file"] {
             display: none;
@@ -507,6 +559,7 @@
         .settings-item input[type="range"] {
             flex: 1;
             min-width: 80px;
+            accent-color: var(--accent);
         }
         .settings-item select {
             padding: 8px 12px;
@@ -514,6 +567,8 @@
             border: 1px solid var(--border-color);
             background: var(--bg-glass);
             color: var(--text-primary);
+            flex: 1;
+            min-width: 80px;
         }
         .settings-item input[type="text"] {
             flex: 1;
@@ -523,7 +578,13 @@
             border: 1px solid var(--border-color);
             background: var(--bg-glass);
             color: var(--text-primary);
-            font-size: 14px;
+            font-size: 18px;
+            text-align: center;
+        }
+        .settings-item .val {
+            font-size: 13px;
+            color: var(--text-secondary);
+            min-width: 40px;
             text-align: center;
         }
         .file-label {
@@ -535,6 +596,8 @@
             cursor: pointer;
             display: inline-block;
         }
+
+        /* ===== DÖVİZ ===== */
         .currency-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -558,6 +621,8 @@
             font-weight: 600;
             color: var(--accent);
         }
+
+        /* ===== ALT TAB BAR (BÜYÜK, ÖZELLEŞTİRİLEBİLİR) ===== */
         .tab-bar {
             position: fixed;
             bottom: 16px;
@@ -573,12 +638,12 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid var(--border-color);
             display: flex;
-            gap: 6px;
+            gap: 4px;
             overflow-x: auto;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
             z-index: 100;
-            height: auto;
+            height: var(--tab-height);
             min-height: 70px;
             align-items: center;
         }
@@ -591,16 +656,16 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px 14px;
+            padding: var(--tab-padding);
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.2s;
-            color: var(--text-secondary);
+            color: var(--tab-passive-color);
             font-size: var(--tab-label-size);
             font-weight: 500;
-            background: transparent;
+            background: var(--tab-passive-bg);
             border: none;
-            min-width: 60px;
+            min-width: var(--tab-min-width);
             white-space: nowrap;
             min-height: 56px;
         }
@@ -614,16 +679,18 @@
             line-height: 1;
         }
         .tab-item.active {
-            color: var(--accent);
-            background: var(--bg-glass);
+            color: var(--tab-active-color);
+            background: var(--tab-active-bg);
         }
         .tab-item:active {
             transform: scale(0.92);
         }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             #app {
                 padding: 16px 12px;
-                padding-bottom: 86px;
+                padding-bottom: 96px;
                 border-radius: 24px;
             }
             .tab-bar {
@@ -631,23 +698,30 @@
                 width: calc(100% - 24px);
                 border-radius: 30px;
                 padding: 8px 10px;
-                min-height: 62px;
+                min-height: 64px;
             }
             .tab-item {
                 padding: 6px 10px;
-                min-width: 48px;
+                min-width: 52px;
                 min-height: 48px;
             }
             .tab-item .tab-icon {
-                font-size: 20px;
+                font-size: calc(var(--tab-icon-size) - 2px);
             }
             .tab-item .tab-label {
-                font-size: 9px;
+                font-size: calc(var(--tab-label-size) - 1px);
             }
             .toast {
-                bottom: 80px;
+                bottom: 84px;
+            }
+            .summary-grid {
+                gap: 8px;
+            }
+            .summary-card .value {
+                font-size: 18px;
             }
         }
+
         ::-webkit-scrollbar {
             width: 4px;
             height: 4px;
@@ -674,19 +748,19 @@
             <div class="summary-grid">
                 <div class="summary-card"><div class="label">Bugün Vadesi Gelen</div><div class="value danger" id="todayTotal">₺0</div></div>
                 <div class="summary-card"><div class="label">Gecikmiş Toplam</div><div class="value danger" id="overdueTotal">₺0</div></div>
-                <div class="summary-card"><div class="label">Yaklaşan Toplam</div><div class="value" id="upcomingTotal">₺0</div></div>
+                <div class="summary-card"><div class="label">Yaklaşan Toplam</div><div class="value warning" id="upcomingTotal">₺0</div></div>
                 <div class="summary-card"><div class="label">Bugünkü Ödemeler</div><div class="value success" id="todayPaymentsTotal">₺0</div></div>
             </div>
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
-                <button class="btn btn-sm btn-secondary" onclick="showPage('page-odenmis')" style="flex:1;">✅ Ödenen</button>
-                <button class="btn btn-sm btn-danger" onclick="showPage('page-odenmemis')" style="flex:1;">⏳ Ödenmeyen</button>
-                <button class="btn btn-sm btn-warning" onclick="showPage('page-buyuk')" style="flex:1;">💰 Büyük</button>
-                <button class="btn btn-sm btn-secondary" onclick="showPage('page-diger')" style="flex:1;">📌 Diğer</button>
+                <button class="btn btn-sm btn-secondary" onclick="navigateTo('page-odenmis')" style="flex:1;">✅ Ödenen</button>
+                <button class="btn btn-sm btn-danger" onclick="navigateTo('page-odenmemis')" style="flex:1;">⏳ Ödenmeyen</button>
+                <button class="btn btn-sm btn-warning" onclick="navigateTo('page-buyuk')" style="flex:1;">💰 Büyük</button>
+                <button class="btn btn-sm btn-secondary" onclick="navigateTo('page-diger')" style="flex:1;">📌 Diğer</button>
             </div>
             <button class="btn" onclick="showAddModal()">➕ Yeni Ödeme Ekle</button>
         </div>
 
-        <!-- ===== AYLIK (TÜM ÖDEMELER) ===== -->
+        <!-- ===== AYLIK (TÜM ÖDEMELER - ANA VERİ KAYNAĞI) ===== -->
         <div id="page-aylik" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📋 Tüm Ödemeler</h3>
             <input type="text" id="searchInput" placeholder="🔍 Ara..." style="width:100%;padding:10px 14px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-glass);color:var(--text-primary);margin-bottom:12px;">
@@ -695,46 +769,50 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== HAFTALIK ===== -->
+        <!-- ===== BU HAFTA (sadece normal kategori) ===== -->
         <div id="page-haftalik" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">📅 Bu Haftaki Ödemeler</h3>
             <div id="haftalikList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== GÜNLÜK ===== -->
+        <!-- ===== BUGÜN (sadece normal kategori) ===== -->
         <div id="page-gunluk" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">📆 Bugünün Ödemeleri</h3>
+            <div style="background:var(--bg-glass);border-radius:20px;padding:12px;text-align:center;margin-bottom:16px;border:1px solid var(--border-color);">
+                <span style="font-size:14px;color:var(--text-secondary);">Toplam</span>
+                <span style="font-size:24px;font-weight:700;color:var(--accent);display:block;" id="gunlukToplam">₺0</span>
+            </div>
             <div id="gunlukList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== ÖDENENLER ===== -->
+        <!-- ===== ÖDENENLER (sadece normal kategori) ===== -->
         <div id="page-odenmis" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">✅ Ödenenler</h3>
             <div id="odenmisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== ÖDENMEYENLER ===== -->
+        <!-- ===== ÖDENMEYENLER (sadece normal kategori, gecikmiş) ===== -->
         <div id="page-odenmemis" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">⏳ Ödenmeyenler (Gecikmiş)</h3>
             <div id="odenmemisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== BÜYÜK ===== -->
+        <!-- ===== BÜYÜK ÖDEMELER (sadece kontrol, bağımsız) ===== -->
         <div id="page-buyuk" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">💰 Büyük Ödemeler</h3>
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">💰 Büyük Ödemeler <span style="font-size:12px;font-weight:400;color:var(--text-secondary);">(Kontrol)</span></h3>
             <div class="total-box" id="buyukTotal">Toplam: ₺0</div>
             <div id="buyukList"></div>
             <button class="btn btn-sm" onclick="showAddModalWithCategory('buyuk')" style="margin-top:8px;">➕ Yeni Büyük Ödeme</button>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== DİĞER ===== -->
+        <!-- ===== DİĞER ÖDEMELER (sadece kontrol, bağımsız) ===== -->
         <div id="page-diger" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">📌 Diğer Ödemeler</h3>
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">📌 Diğer Ödemeler <span style="font-size:12px;font-weight:400;color:var(--text-secondary);">(Kontrol)</span></h3>
             <div class="total-box" id="digerTotal">Toplam: ₺0</div>
             <div id="digerList"></div>
             <button class="btn btn-sm" onclick="showAddModalWithCategory('diger')" style="margin-top:8px;">➕ Yeni Diğer Ödeme</button>
@@ -795,11 +873,11 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== AYARLAR ===== -->
+        <!-- ===== AYARLAR (GENİŞLETİLMİŞ) ===== -->
         <div id="page-settings" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:16px;">⚙️ Ayarlar</h3>
 
-            <!-- Tema -->
+            <!-- TEMA -->
             <div class="settings-item">
                 <span class="label">🌓 Tema</span>
                 <select id="themeSelect" onchange="applyTheme()">
@@ -809,33 +887,79 @@
                 </select>
             </div>
 
-            <!-- Ana Renk -->
+            <!-- ANA RENK -->
             <div class="settings-item">
                 <span class="label">🎨 Ana Renk</span>
                 <input type="color" id="accentColor" value="#2d6a4f" onchange="applyAccentColor()">
             </div>
 
-            <!-- Buton Yuvarlaklığı -->
+            <!-- BUTON YUVARLAKLIĞI -->
             <div class="settings-item">
                 <span class="label">🔘 Buton Yuvarlaklığı</span>
                 <input type="range" id="btnRadius" min="0" max="50" value="30" oninput="applyButtonStyle()">
-                <span id="btnRadiusVal">30px</span>
+                <span class="val" id="btnRadiusVal">30px</span>
             </div>
 
-            <!-- TAB BAR RENK -->
+            <!-- ===== ALT MENÜ ÖZELLEŞTİRME ===== -->
+            <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin:16px 0 8px;">📱 Alt Menü</div>
+
+            <!-- Buton Boyutu (min-width) -->
             <div class="settings-item">
-                <span class="label">🎨 Tab Bar Rengi</span>
-                <input type="color" id="tabColor" value="#2d6a4f" onchange="applyTabStyle()">
+                <span class="label">📐 Buton Boyutu</span>
+                <input type="range" id="tabMinWidth" min="44" max="100" value="68" oninput="applyTabStyle()">
+                <span class="val" id="tabMinWidthVal">68px</span>
             </div>
 
-            <!-- TAB BAR İKON (Emoji) -->
+            <!-- İkon Boyutu -->
             <div class="settings-item">
-                <span class="label">🔣 Tab İkonu</span>
-                <input type="text" id="tabIconInput" placeholder="🏠" maxlength="2" style="flex:1;min-width:60px;padding:6px 10px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-glass);color:var(--text-primary);font-size:20px;text-align:center;">
-                <button class="btn btn-sm" onclick="applyTabIcon()" style="width:auto;">Uygula</button>
+                <span class="label">🔣 İkon Boyutu</span>
+                <input type="range" id="tabIconSize" min="16" max="36" value="26" oninput="applyTabStyle()">
+                <span class="val" id="tabIconSizeVal">26px</span>
             </div>
 
-            <!-- Bildirimler -->
+            <!-- Yazı Boyutu -->
+            <div class="settings-item">
+                <span class="label">📝 Yazı Boyutu</span>
+                <input type="range" id="tabLabelSize" min="8" max="16" value="12" oninput="applyTabStyle()">
+                <span class="val" id="tabLabelSizeVal">12px</span>
+            </div>
+
+            <!-- Buton Yüksekliği (padding) -->
+            <div class="settings-item">
+                <span class="label">📏 Buton Yüksekliği</span>
+                <input type="range" id="tabPadding" min="4" max="20" value="10" oninput="applyTabStyle()">
+                <span class="val" id="tabPaddingVal">10px</span>
+            </div>
+
+            <!-- Aktif Renk -->
+            <div class="settings-item">
+                <span class="label">🎨 Aktif Renk</span>
+                <input type="color" id="tabActiveColor" value="#2d6a4f" onchange="applyTabStyle()">
+            </div>
+
+            <!-- Pasif Renk -->
+            <div class="settings-item">
+                <span class="label">🎨 Pasif Renk</span>
+                <input type="color" id="tabPassiveColor" value="#6c757d" onchange="applyTabStyle()">
+            </div>
+
+            <!-- Aktif Arka Plan -->
+            <div class="settings-item">
+                <span class="label">🟢 Aktif Arka Plan</span>
+                <input type="color" id="tabActiveBg" value="#2d6a4f1f" onchange="applyTabStyle()">
+                <span style="font-size:11px;color:var(--text-secondary);">(şeffaflık için hex sonuna 1f ekleyin)</span>
+            </div>
+
+            <!-- Pasif Arka Plan -->
+            <div class="settings-item">
+                <span class="label">🔘 Pasif Arka Plan</span>
+                <input type="color" id="tabPassiveBg" value="#ffffff00" onchange="applyTabStyle()">
+                <span style="font-size:11px;color:var(--text-secondary);">(şeffaflık için hex sonuna 00 ekleyin)</span>
+            </div>
+
+            <!-- ===== BİLDİRİMLER ===== -->
+            <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin:16px 0 8px;">🔔 Bildirimler</div>
+
             <div class="settings-item">
                 <span class="label">🔔 Bildirimler</span>
                 <select id="notificationSelect" onchange="toggleNotifications()">
@@ -860,14 +984,14 @@
                 </select>
             </div>
 
-            <!-- Dışa Aktar -->
+            <!-- ===== VERİ YÖNETİMİ ===== -->
+            <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin:16px 0 8px;">💾 Veri</div>
+
             <div class="settings-item">
                 <span class="label">📤 Dışa Aktar</span>
                 <button class="btn btn-sm" onclick="exportData('json')" style="width:auto;">JSON</button>
                 <button class="btn btn-sm" onclick="exportData('csv')" style="width:auto;">CSV</button>
             </div>
-
-            <!-- Yedekten Geri Yükle -->
             <div class="settings-item">
                 <span class="label">📥 Yedekten Geri Yükle</span>
                 <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="restoreData(event)">
@@ -875,7 +999,9 @@
                 <span style="font-size:11px;color:var(--text-secondary);width:100%;">Web'deki verileri telefonda görmek için dışa aktarıp buradan yükleyin.</span>
             </div>
 
-            <!-- Arka Plan Görseli -->
+            <!-- ===== ARKA PLAN ===== -->
+            <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin:16px 0 8px;">🖼️ Arka Plan</div>
+
             <div class="settings-item">
                 <span class="label">🖼️ Arka Plan Görseli</span>
                 <button class="btn btn-sm file-label" onclick="document.getElementById('bgImageInput').click()">📁 Galeriden Seç</button>
@@ -884,16 +1010,16 @@
             </div>
             <div id="bgPreview" style="display:none; margin-bottom:10px;"><img id="bgPreviewImg" style="width:100%; max-height:100px; object-fit:cover; border-radius:12px;"></div>
 
-            <!-- Tüm Verileri Sil -->
+            <!-- ===== VERİ TEMİZLEME ===== -->
             <div class="settings-item">
                 <span class="label">🗑️ Tüm Verileri Sil</span>
                 <button class="btn btn-sm btn-danger" onclick="clearAllData()">Sil</button>
             </div>
 
-            <!-- Hakkında -->
+            <!-- ===== HAKKINDA ===== -->
             <div class="settings-item">
                 <span class="label">ℹ️ Hakkında</span>
-                <span style="color:var(--text-secondary);">v6.0 • Tab Bar Özelleştirme</span>
+                <span style="color:var(--text-secondary);">v7.0 • Ödeme Takip Pro</span>
             </div>
 
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
@@ -905,8 +1031,8 @@
                 <h2 id="addModalTitle">➕ Yeni Ödeme</h2>
                 <label>Ödeme Adı (Firma)</label>
                 <input type="text" id="addName" placeholder="Örn: Elektrik Faturası">
-                <label>Kategori</label>
-                <select id="addCategorySelect"></select>
+                <label>Açıklama / Not</label>
+                <input type="text" id="addNote" placeholder="Örn: TEDAŞ">
                 <label>Tutar</label>
                 <input type="number" id="addAmount" placeholder="0.00" step="0.01">
                 <label>Para Birimi</label>
@@ -917,8 +1043,10 @@
                     <option value="GBP">£ Sterlin</option>
                     <option value="CHF">CHF İsviçre Frangı</option>
                 </select>
-                <label>Tarih</label>
+                <label>Vade Tarihi</label>
                 <input type="date" id="addDate">
+                <label>Kategori</label>
+                <select id="addCategorySelect"></select>
                 <label>Periyot</label>
                 <select id="addPeriod">
                     <option value="Günlük">Günlük</option>
@@ -936,8 +1064,6 @@
                     <option value="semiannual">6 ayda bir</option>
                     <option value="yearly">Yılda bir</option>
                 </select>
-                <label>Notlar</label>
-                <input type="text" id="addNote" placeholder="Örn: TEDAŞ">
                 <div class="btn-group">
                     <button class="btn btn-secondary" onclick="closeAddModal()">İptal</button>
                     <button class="btn" onclick="addPayment()" id="saveAddBtn">💾 Kaydet</button>
@@ -950,8 +1076,8 @@
                 <h2>✏️ Ödeme Düzenle</h2>
                 <label>Ödeme Adı</label>
                 <input type="text" id="editName">
-                <label>Kategori</label>
-                <select id="editCategorySelect"></select>
+                <label>Açıklama / Not</label>
+                <input type="text" id="editNote">
                 <label>Tutar</label>
                 <input type="number" id="editAmount" step="0.01">
                 <label>Para Birimi</label>
@@ -962,8 +1088,10 @@
                     <option value="GBP">£ Sterlin</option>
                     <option value="CHF">CHF İsviçre Frangı</option>
                 </select>
-                <label>Tarih</label>
+                <label>Vade Tarihi</label>
                 <input type="date" id="editDate">
+                <label>Kategori</label>
+                <select id="editCategorySelect"></select>
                 <label>Periyot</label>
                 <select id="editPeriod">
                     <option value="Günlük">Günlük</option>
@@ -981,8 +1109,6 @@
                     <option value="semiannual">6 ayda bir</option>
                     <option value="yearly">Yılda bir</option>
                 </select>
-                <label>Notlar</label>
-                <input type="text" id="editNote">
                 <div class="btn-group">
                     <button class="btn btn-secondary" onclick="closeEditModal()">İptal</button>
                     <button class="btn" onclick="saveEditPayment()">💾 Güncelle</button>
@@ -991,7 +1117,7 @@
         </div>
     </div>
 
-    <!-- ===== ALT TAB BAR (BÜYÜTÜLDÜ, KAYDIRILABİLİR) ===== -->
+    <!-- ===== ALT TAB BAR (BÜYÜK, ÖZELLEŞTİRİLEBİLİR) ===== -->
     <div class="tab-bar" id="tabBar">
         <button class="tab-item active" data-page="page-home" onclick="navigateTo('page-home')">
             <span class="tab-icon" id="tabIconHome">🏠</span>
@@ -1046,7 +1172,7 @@
 
         function openDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, 7);
+                const request = indexedDB.open(DB_NAME, 8);
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE_NAME)) {
@@ -1181,12 +1307,31 @@
             t._timer = setTimeout(() => t.classList.remove('show'), 4000);
         }
 
+        function getTodayStr() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getWeekRange() {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0=Pazar, 1=Pazartesi...
+            const diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - diffToMonday);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            return {
+                start: monday.toISOString().split('T')[0],
+                end: sunday.toISOString().split('T')[0]
+            };
+        }
+
         // ================================================================
         // SAYFA YÖNETİMİ
         // ================================================================
         function navigateTo(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
+            const target = document.getElementById(pageId);
+            if (target) target.classList.add('active');
             document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
             const activeTab = document.querySelector(`.tab-item[data-page="${pageId}"]`);
             if (activeTab) activeTab.classList.add('active');
@@ -1220,14 +1365,15 @@
         async function renderSummary() {
             try {
                 const payments = await getAllPayments();
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const todayStr = today.toISOString().split('T')[0];
+                const todayStr = getTodayStr();
+                const today = new Date(todayStr + 'T00:00:00');
+
                 let todayTotal = 0,
                     overdueTotal = 0,
                     upcomingTotal = 0,
                     todayPaymentsTotal = 0;
                 const normalPayments = payments.filter(p => p.category === 'normal' || !p.category);
+
                 normalPayments.forEach(p => {
                     const pDate = new Date(p.date + 'T00:00:00');
                     const amount = parseFloat(p.amount) || 0;
@@ -1241,6 +1387,7 @@
                         todayPaymentsTotal += amount;
                     } else upcomingTotal += amount;
                 });
+
                 document.getElementById('todayTotal').textContent = formatCurrency(todayTotal);
                 document.getElementById('overdueTotal').textContent = formatCurrency(overdueTotal);
                 document.getElementById('upcomingTotal').textContent = formatCurrency(upcomingTotal);
@@ -1252,15 +1399,17 @@
         // LİSTE RENDER (ortak)
         // ================================================================
         function renderPaymentItem(p, showActions = true) {
-            const today = new Date().toISOString().split('T')[0];
-            const isOverdue = p.date < today && !p.paid;
-            const isToday = p.date === today && !p.paid;
+            const todayStr = getTodayStr();
+            const isOverdue = p.date < todayStr && !p.paid;
+            const isToday = p.date === todayStr && !p.paid;
             let badge = '';
             if (p.paid) badge = '<span class="badge odendi">Ödendi</span>';
             else if (isOverdue) badge = '<span class="badge gecikmis">Gecikmiş</span>';
-            else if (isToday) badge = '<span class="badge" style="background:rgba(255,215,0,0.2);color:#ffd700;">Bugün</span>';
+            else if (isToday) badge = '<span class="badge bugun">Bugün</span>';
+
             const currency = p.currency || 'TRY';
             const amountStr = formatCurrency(p.amount, currency);
+
             return `
                 <div class="payment-item">
                     <div class="info">
@@ -1270,7 +1419,7 @@
                     </div>
                     ${showActions ? `
                     <div class="actions">
-                        <button onclick="togglePaid(${p.id})" title="Ödendi/Ödenmedi">${p.paid ? '✅' : '⬜'}</button>
+                        <button class="pay-btn" onclick="togglePaid(${p.id})" title="Ödendi/Ödenmedi">${p.paid ? '✅' : '⬜'}</button>
                         <button onclick="openEditModal(${p.id})" title="Düzenle">✏️</button>
                         <button onclick="deleteSinglePayment(${p.id})" title="Sil">🗑️</button>
                     </div>
@@ -1280,7 +1429,7 @@
         }
 
         // ================================================================
-        // AYLIK LİSTE (TÜM ÖDEMELER)
+        // AYLIK LİSTE (TÜM ÖDEMELER - ANA VERİ KAYNAĞI)
         // ================================================================
         async function renderAylik() {
             try {
@@ -1293,70 +1442,98 @@
                     (p.amount || '').toString().includes(search) ||
                     (p.currency || '').toLowerCase().includes(search)
                 ).sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 const container = document.getElementById('aylikList');
                 if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Hiç ödeme yok</div>'; return; }
-                container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
+
+                // Büyük ve Diğer kategorilerinde ödendi butonunu gösterme
+                container.innerHTML = filtered.map(p => {
+                    const showActions = (p.category !== 'buyuk' && p.category !== 'diger');
+                    return renderPaymentItem(p, showActions);
+                }).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
         // ================================================================
-        // DİĞER LİSTELER (Kısaltılmış)
+        // BU HAFTA (sadece normal kategori)
         // ================================================================
         async function renderHaftalik() {
             try {
                 const payments = await getAllPayments();
-                const today = new Date();
-                const dayOfWeek = today.getDay();
-                const diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
-                const monday = new Date(today);
-                monday.setDate(today.getDate() - diffToMonday);
-                const sunday = new Date(monday);
-                sunday.setDate(monday.getDate() + 6);
+                const week = getWeekRange();
                 const filtered = payments.filter(p => {
-                    const pDate = new Date(p.date + 'T00:00:00');
-                    return pDate >= monday && pDate <= sunday;
+                    const cat = p.category || 'normal';
+                    return (cat === 'normal') && p.date >= week.start && p.date <= week.end;
                 }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 const container = document.getElementById('haftalikList');
                 if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bu hafta ödeme yok</div>'; return; }
                 container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
+        // ================================================================
+        // BUGÜN (sadece normal kategori + toplam)
+        // ================================================================
         async function renderGunluk() {
             try {
                 const payments = await getAllPayments();
-                const todayStr = new Date().toISOString().split('T')[0];
-                const filtered = payments.filter(p => p.date === todayStr).sort((a, b) => new Date(a.date) - new Date(b.date));
+                const todayStr = getTodayStr();
+                const filtered = payments.filter(p => {
+                    const cat = p.category || 'normal';
+                    return cat === 'normal' && p.date === todayStr;
+                }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 const container = document.getElementById('gunlukList');
-                if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bugün ödeme yok</div>'; return; }
+                if (!filtered.length) {
+                    container.innerHTML = '<div class="empty">📭 Bugün ödeme yok</div>';
+                    document.getElementById('gunlukToplam').textContent = '₺0';
+                    return;
+                }
+                const total = filtered.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+                document.getElementById('gunlukToplam').textContent = formatCurrency(total);
                 container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
+        // ================================================================
+        // ÖDENENLER (sadece normal kategori)
+        // ================================================================
         async function renderOdenenler() {
             try {
                 const payments = await getAllPayments();
-                const filtered = payments.filter(p => (p.category === 'normal' || !p.category) && p.paid === true)
-                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+                const filtered = payments.filter(p => {
+                    const cat = p.category || 'normal';
+                    return cat === 'normal' && p.paid === true;
+                }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 const container = document.getElementById('odenmisList');
-                if (!filtered.length) { container.innerHTML = '<div class="empty">✅ Ödenen normal ödeme yok</div>'; return; }
+                if (!filtered.length) { container.innerHTML = '<div class="empty">✅ Ödenen ödeme yok</div>'; return; }
                 container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
+        // ================================================================
+        // ÖDENMEYENLER (sadece normal kategori, gecikmiş)
+        // ================================================================
         async function renderOdenmeyenler() {
             try {
                 const payments = await getAllPayments();
-                const today = new Date().toISOString().split('T')[0];
-                const filtered = payments.filter(p => (p.category === 'normal' || !p.category) && p.paid === false && p
-                    .date < today)
-                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+                const todayStr = getTodayStr();
+                const filtered = payments.filter(p => {
+                    const cat = p.category || 'normal';
+                    return cat === 'normal' && p.paid === false && p.date < todayStr;
+                }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 const container = document.getElementById('odenmemisList');
-                if (!filtered.length) { container.innerHTML = '<div class="empty">⏳ Gecikmiş normal ödeme yok</div>'; return; }
+                if (!filtered.length) { container.innerHTML = '<div class="empty">⏳ Gecikmiş ödeme yok</div>'; return; }
                 container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
+        // ================================================================
+        // BÜYÜK ÖDEMELER (sadece kontrol, bağımsız)
+        // ================================================================
         async function renderBuyuk() {
             try {
                 const payments = await getAllPayments();
@@ -1366,10 +1543,14 @@
                 document.getElementById('buyukTotal').textContent = 'Toplam: ' + formatCurrency(total);
                 const container = document.getElementById('buyukList');
                 if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Büyük ödeme yok</div>'; return; }
-                container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
+                // Büyük ödemelerde ödendi butonu gösterilmez (showActions: false)
+                container.innerHTML = filtered.map(p => renderPaymentItem(p, false)).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
+        // ================================================================
+        // DİĞER ÖDEMELER (sadece kontrol, bağımsız)
+        // ================================================================
         async function renderDiger() {
             try {
                 const payments = await getAllPayments();
@@ -1379,18 +1560,24 @@
                 document.getElementById('digerTotal').textContent = 'Toplam: ' + formatCurrency(total);
                 const container = document.getElementById('digerList');
                 if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Diğer ödeme yok</div>'; return; }
-                container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
+                // Diğer ödemelerde ödendi butonu gösterilmez (showActions: false)
+                container.innerHTML = filtered.map(p => renderPaymentItem(p, false)).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
         // ================================================================
-        // TEK TIKLA ÖDEME
+        // TEK TIKLA ÖDEME (sadece normal kategori için çalışır)
         // ================================================================
         async function togglePaid(id) {
             try {
                 const payments = await getAllPayments();
                 const p = payments.find(item => item.id === id);
                 if (!p) return;
+                // Büyük ve Diğer kategorilerde ödendi işlemi yapılamaz (güvenlik)
+                if (p.category === 'buyuk' || p.category === 'diger') {
+                    showToast('❌ Büyük/Diğer ödemelerde durum değiştirilemez');
+                    return;
+                }
                 p.paid = !p.paid;
                 if (p.paid) {
                     p.paidDate = new Date().toISOString();
@@ -1440,8 +1627,7 @@
                 await populateCategorySelect('addCategorySelect');
                 document.getElementById('addModal').classList.add('active');
                 document.getElementById('addModalTitle').textContent = '➕ Yeni Ödeme';
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('addDate').value = today;
+                document.getElementById('addDate').value = getTodayStr();
                 document.getElementById('addCategorySelect').disabled = false;
             } catch (e) {
                 showToast('❌ Kategoriler yüklenirken hata: ' + e.message);
@@ -1453,8 +1639,7 @@
             document.getElementById('addCategorySelect').value = category;
             document.getElementById('addModalTitle').textContent = category === 'buyuk' ? '💰 Yeni Büyük Ödeme' : '📌 Yeni Diğer Ödeme';
             document.getElementById('addCategorySelect').disabled = true;
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('addDate').value = today;
+            document.getElementById('addDate').value = getTodayStr();
         }
 
         function closeAddModal() {
@@ -1527,12 +1712,12 @@
                 '');
                 editingId = id;
                 document.getElementById('editName').value = p.name || '';
+                document.getElementById('editNote').value = p.note || '';
                 document.getElementById('editAmount').value = p.amount || '';
                 document.getElementById('editDate').value = p.date || '';
                 document.getElementById('editPeriod').value = p.period || 'Aylık';
                 document.getElementById('editCurrency').value = p.currency || 'TRY';
                 document.getElementById('editRecurrence').value = p.recurrence || 'none';
-                document.getElementById('editNote').value = p.note || '';
                 document.getElementById('editModal').classList.add('active');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
@@ -1918,12 +2103,16 @@
             const color = document.getElementById('accentColor').value;
             document.documentElement.style.setProperty('--accent', color);
             localStorage.setItem('accentColor', color);
+            // Tab aktif rengini de güncelle
+            document.documentElement.style.setProperty('--tab-active-color', color);
+            localStorage.setItem('tabActiveColor', color);
         }
 
         function loadAccentColor() {
             const color = localStorage.getItem('accentColor') || '#2d6a4f';
             document.getElementById('accentColor').value = color;
             document.documentElement.style.setProperty('--accent', color);
+            document.documentElement.style.setProperty('--tab-active-color', color);
         }
 
         function applyButtonStyle() {
@@ -1940,48 +2129,65 @@
         }
 
         // ================================================================
-        // TAB BAR ÖZELLEŞTİRME (Renk + İkon)
+        // TAB BAR ÖZELLEŞTİRME (KAPSAMLI)
         // ================================================================
         function applyTabStyle() {
-            const color = document.getElementById('tabColor').value;
-            document.documentElement.style.setProperty('--accent', color);
-            localStorage.setItem('tabColor', color);
-            // Tab bar aktif renklerini güncelle
-            document.querySelectorAll('.tab-item.active').forEach(el => {
-                el.style.color = color;
-            });
-            showToast('✅ Tab rengi güncellendi');
+            const minWidth = document.getElementById('tabMinWidth').value;
+            const iconSize = document.getElementById('tabIconSize').value;
+            const labelSize = document.getElementById('tabLabelSize').value;
+            const padding = document.getElementById('tabPadding').value;
+            const activeColor = document.getElementById('tabActiveColor').value;
+            const passiveColor = document.getElementById('tabPassiveColor').value;
+            const activeBg = document.getElementById('tabActiveBg').value;
+            const passiveBg = document.getElementById('tabPassiveBg').value;
+
+            document.documentElement.style.setProperty('--tab-min-width', minWidth + 'px');
+            document.documentElement.style.setProperty('--tab-icon-size', iconSize + 'px');
+            document.documentElement.style.setProperty('--tab-label-size', labelSize + 'px');
+            document.documentElement.style.setProperty('--tab-padding', padding + 'px 16px');
+            document.documentElement.style.setProperty('--tab-active-color', activeColor);
+            document.documentElement.style.setProperty('--tab-passive-color', passiveColor);
+            document.documentElement.style.setProperty('--tab-active-bg', activeBg);
+            document.documentElement.style.setProperty('--tab-passive-bg', passiveBg);
+
+            document.getElementById('tabMinWidthVal').textContent = minWidth + 'px';
+            document.getElementById('tabIconSizeVal').textContent = iconSize + 'px';
+            document.getElementById('tabLabelSizeVal').textContent = labelSize + 'px';
+            document.getElementById('tabPaddingVal').textContent = padding + 'px';
+
+            localStorage.setItem('tabMinWidth', minWidth);
+            localStorage.setItem('tabIconSize', iconSize);
+            localStorage.setItem('tabLabelSize', labelSize);
+            localStorage.setItem('tabPadding', padding);
+            localStorage.setItem('tabActiveColor', activeColor);
+            localStorage.setItem('tabPassiveColor', passiveColor);
+            localStorage.setItem('tabActiveBg', activeBg);
+            localStorage.setItem('tabPassiveBg', passiveBg);
         }
 
         function loadTabStyle() {
-            const color = localStorage.getItem('tabColor') || '#2d6a4f';
-            document.getElementById('tabColor').value = color;
-            document.documentElement.style.setProperty('--accent', color);
+            const minWidth = localStorage.getItem('tabMinWidth') || '68';
+            const iconSize = localStorage.getItem('tabIconSize') || '26';
+            const labelSize = localStorage.getItem('tabLabelSize') || '12';
+            const padding = localStorage.getItem('tabPadding') || '10';
+            const activeColor = localStorage.getItem('tabActiveColor') || '#2d6a4f';
+            const passiveColor = localStorage.getItem('tabPassiveColor') || '#6c757d';
+            const activeBg = localStorage.getItem('tabActiveBg') || '#2d6a4f1f';
+            const passiveBg = localStorage.getItem('tabPassiveBg') || '#ffffff00';
+
+            document.getElementById('tabMinWidth').value = minWidth;
+            document.getElementById('tabIconSize').value = iconSize;
+            document.getElementById('tabLabelSize').value = labelSize;
+            document.getElementById('tabPadding').value = padding;
+            document.getElementById('tabActiveColor').value = activeColor;
+            document.getElementById('tabPassiveColor').value = passiveColor;
+            document.getElementById('tabActiveBg').value = activeBg;
+            document.getElementById('tabPassiveBg').value = passiveBg;
+
+            applyTabStyle();
         }
 
-        function applyTabIcon() {
-            const icon = document.getElementById('tabIconInput').value.trim();
-            if (!icon) { showToast('❌ Bir emoji girin'); return; }
-            // Tüm tab ikonlarını değiştir (isteğe bağlı, sadece aktif olanı değiştirmek için)
-            // Bu örnekte sadece aktif sayfanın ikonunu değiştiriyoruz
-            const activePage = document.querySelector('.page.active');
-            if (!activePage) { showToast('❌ Bir sayfa açık değil'); return; }
-            const pageId = activePage.id;
-            const tab = document.querySelector(`.tab-item[data-page="${pageId}"]`);
-            if (!tab) { showToast('❌ Tab bulunamadı'); return; }
-            const iconSpan = tab.querySelector('.tab-icon');
-            if (iconSpan) {
-                iconSpan.textContent = icon;
-                // Kaydet
-                const savedIcons = JSON.parse(localStorage.getItem('tabIcons') || '{}');
-                savedIcons[pageId] = icon;
-                localStorage.setItem('tabIcons', JSON.stringify(savedIcons));
-                showToast('✅ Tab ikonu güncellendi');
-            } else {
-                showToast('❌ İkon alanı bulunamadı');
-            }
-        }
-
+        // Tab ikonlarını yükle
         function loadTabIcons() {
             const savedIcons = JSON.parse(localStorage.getItem('tabIcons') || '{}');
             Object.keys(savedIcons).forEach(pageId => {
@@ -1993,6 +2199,27 @@
                     }
                 }
             });
+        }
+
+        // Tab ikonu değiştirme (ayarlardan)
+        function applyTabIcon() {
+            const icon = document.getElementById('tabIconInput').value.trim();
+            if (!icon) { showToast('❌ Bir emoji girin'); return; }
+            const activePage = document.querySelector('.page.active');
+            if (!activePage) { showToast('❌ Bir sayfa açık değil'); return; }
+            const pageId = activePage.id;
+            const tab = document.querySelector(`.tab-item[data-page="${pageId}"]`);
+            if (!tab) { showToast('❌ Tab bulunamadı'); return; }
+            const iconSpan = tab.querySelector('.tab-icon');
+            if (iconSpan) {
+                iconSpan.textContent = icon;
+                const savedIcons = JSON.parse(localStorage.getItem('tabIcons') || '{}');
+                savedIcons[pageId] = icon;
+                localStorage.setItem('tabIcons', JSON.stringify(savedIcons));
+                showToast('✅ Tab ikonu güncellendi');
+            } else {
+                showToast('❌ İkon alanı bulunamadı');
+            }
         }
 
         // ================================================================
@@ -2080,6 +2307,7 @@
                 const reminderDays = parseInt(document.getElementById('reminderDays').value);
                 payments.forEach(p => {
                     if (p.paid) return;
+                    if (p.category === 'buyuk' || p.category === 'diger') return; // Büyük/Diğer bildirim yapma
                     const pDate = new Date(p.date + 'T00:00:00');
                     const diff = Math.ceil((pDate - today) / (1000 * 60 * 60 * 24));
                     if (diff === reminderDays || diff === 0 || diff < 0) {
@@ -2229,6 +2457,7 @@
                 const today = new Date().toISOString().split('T')[0];
                 for (const p of payments) {
                     if (!p.recurrence || p.recurrence === 'none') continue;
+                    if (p.category === 'buyuk' || p.category === 'diger') continue; // Büyük/Diğer tekrarlamasın
                     const pDate = new Date(p.date + 'T00:00:00');
                     const todayDate = new Date(today + 'T00:00:00');
                     let diff = 0;
@@ -2323,10 +2552,10 @@
                 loadTheme();
                 loadAccentColor();
                 loadButtonStyle();
-                loadNotificationSettings();
-                loadBackground();
                 loadTabStyle();
                 loadTabIcons();
+                loadNotificationSettings();
+                loadBackground();
 
                 const categories = await getAllCategories();
                 if (categories.length === 0) {
@@ -2337,7 +2566,7 @@
 
                 const payments = await getAllPayments();
                 if (payments.length === 0) {
-                    const today = new Date().toISOString().split('T')[0];
+                    const today = getTodayStr();
                     const sample = [
                         { name: 'Elektrik Faturası', amount: 450, date: today, period: 'Aylık', category: 'Elektrik',
                             note: 'TEDAŞ', paid: false, currency: 'TRY', recurrence: 'none' },
