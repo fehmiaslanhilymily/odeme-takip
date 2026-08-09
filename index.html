@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
-        /* ===== DEĞİŞKENLER ===== */
+        /* ===== TÜM STILLER (ÖNCEKİYLE AYNI) ===== */
         :root {
             --bg-primary: #f4f6f9;
             --bg-card: rgba(255, 255, 255, 0.85);
@@ -67,7 +67,7 @@
             flex-direction: column;
             border: 1px solid var(--border-color);
             position: relative;
-            padding-bottom: 80px; /* Tab bar için boşluk */
+            padding-bottom: 80px;
         }
         .header {
             display: flex;
@@ -99,8 +99,6 @@
             transform: scale(0.9);
             background: rgba(0, 0, 0, 0.1);
         }
-
-        /* ===== BUTONLAR ===== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -140,8 +138,6 @@
             font-size: 12px;
             width: auto;
         }
-
-        /* ===== SAYFALAR ===== */
         .page {
             display: none;
             animation: fadeUp 0.4s ease;
@@ -159,8 +155,6 @@
                 transform: translateY(0);
             }
         }
-
-        /* ===== ÖZET KARTLARI ===== */
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -195,8 +189,6 @@
         .summary-card .value.success {
             color: #2d6a4f;
         }
-
-        /* ===== LİSTE ÖĞELERİ ===== */
         .payment-item {
             background: var(--bg-glass);
             backdrop-filter: blur(8px);
@@ -264,8 +256,6 @@
         .payment-item .actions button:active {
             background: rgba(0, 0, 0, 0.1);
         }
-
-        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -326,8 +316,6 @@
         .modal-box .btn-group .btn {
             flex: 1;
         }
-
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 90px;
@@ -359,7 +347,6 @@
                 transform: translateX(-50%) scale(1);
             }
         }
-
         .empty {
             color: var(--text-secondary);
             text-align: center;
@@ -378,8 +365,6 @@
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
-
-        /* ===== TAKVİM ===== */
         .calendar {
             background: var(--bg-glass);
             border-radius: 24px;
@@ -459,8 +444,6 @@
             background: var(--accent);
             color: #fff;
         }
-
-        /* ===== GRAFİK ===== */
         .chart-container {
             background: var(--bg-glass);
             border-radius: 20px;
@@ -471,8 +454,6 @@
         .chart-container canvas {
             max-height: 180px;
         }
-
-        /* ===== İSTATİSTİK ===== */
         .stat-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -495,8 +476,6 @@
             font-size: 11px;
             color: var(--text-secondary);
         }
-
-        /* ===== AYARLAR ===== */
         .settings-item {
             background: var(--bg-glass);
             backdrop-filter: blur(8px);
@@ -547,8 +526,6 @@
             cursor: pointer;
             display: inline-block;
         }
-
-        /* ===== DÖVİZ ===== */
         .currency-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -572,8 +549,6 @@
             font-weight: 600;
             color: var(--accent);
         }
-
-        /* ===== ALT TAB BAR (iPhone Tarzı) ===== */
         .tab-bar {
             position: fixed;
             bottom: 16px;
@@ -631,8 +606,6 @@
         .tab-item:active {
             transform: scale(0.92);
         }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             #app {
                 padding: 16px 12px;
@@ -665,8 +638,6 @@
                 bottom: 80px;
             }
         }
-
-        /* Kaydırma çubuğu gizleme */
         ::-webkit-scrollbar {
             width: 4px;
             height: 4px;
@@ -696,50 +667,45 @@
                 <div class="summary-card"><div class="label">Yaklaşan Toplam</div><div class="value" id="upcomingTotal">₺0</div></div>
                 <div class="summary-card"><div class="label">Bugünkü Ödemeler</div><div class="value success" id="todayPaymentsTotal">₺0</div></div>
             </div>
-            <!-- Hızlı erişim butonları (Ödenen, Ödenmeyen, Büyük, Diğer) -->
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
                 <button class="btn btn-sm btn-secondary" onclick="showPage('page-odenmis')" style="flex:1;">✅ Ödenen</button>
                 <button class="btn btn-sm btn-danger" onclick="showPage('page-odenmemis')" style="flex:1;">⏳ Ödenmeyen</button>
                 <button class="btn btn-sm btn-warning" onclick="showPage('page-buyuk')" style="flex:1;">💰 Büyük</button>
                 <button class="btn btn-sm btn-secondary" onclick="showPage('page-diger')" style="flex:1;">📌 Diğer</button>
             </div>
-            <!-- Yeni Ödeme Ekle Butonu -->
             <button class="btn" onclick="showAddModal()">➕ Yeni Ödeme Ekle</button>
         </div>
 
-        <!-- ===== DİĞER SAYFALAR (aynı, sadece başlık ve liste) ===== -->
+        <!-- ===== AYLIK (TÜM ÖDEMELER) ===== -->
         <div id="page-aylik" class="page">
-            <h3 style="color:var(--text-primary);margin-bottom:12px;">📋 Bu Ayki Normal Ödemeler</h3>
+            <h3 style="color:var(--text-primary);margin-bottom:12px;">📋 Tüm Ödemeler</h3>
             <input type="text" id="searchInput" placeholder="🔍 Ara..." style="width:100%;padding:10px 14px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-glass);color:var(--text-primary);margin-bottom:12px;">
             <div id="aylikList"></div>
             <button class="btn btn-sm" onclick="showAddModal()" style="margin-top:8px;">➕ Yeni Ödeme Ekle</button>
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
         </div>
 
+        <!-- ===== DİĞER SAYFALAR (Değişmedi) ===== -->
         <div id="page-haftalik" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
             <div id="haftalikList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-gunluk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
             <div id="gunlukList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-odenmis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
             <div id="odenmisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-odenmemis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
             <div id="odenmemisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-buyuk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💰 Büyük Ödemeler</h3>
             <div class="total-box" id="buyukTotal">Toplam: ₺0</div>
@@ -747,7 +713,6 @@
             <button class="btn btn-sm" onclick="showAddModalWithCategory('buyuk')" style="margin-top:8px;">➕ Yeni Büyük Ödeme</button>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-diger" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📌 Diğer Ödemeler</h3>
             <div class="total-box" id="digerTotal">Toplam: ₺0</div>
@@ -755,7 +720,6 @@
             <button class="btn btn-sm" onclick="showAddModalWithCategory('diger')" style="margin-top:8px;">➕ Yeni Diğer Ödeme</button>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-calendar" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">🗓️ Takvim</h3>
             <div class="calendar" id="calendarContainer">
@@ -772,7 +736,6 @@
             <div id="calendarDayDetail" style="margin-top:12px;"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-charts" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📊 Grafikler</h3>
             <div class="chart-container"><canvas id="chart30days"></canvas></div>
@@ -781,13 +744,11 @@
             <div class="chart-container"><canvas id="chart12months"></canvas></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-stats" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📈 İstatistikler</h3>
             <div class="stat-grid" id="statsGrid"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
-
         <div id="page-categories" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">🏷️ Kategoriler</h3>
             <div id="categoryList" style="margin-bottom:12px;"></div>
@@ -797,17 +758,14 @@
             </div>
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
-
         <div id="page-currency" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:var(--text-secondary);">(Genelpara.com)</small></h3>
             <div id="currencyList" class="currency-grid"></div>
             <button class="btn btn-sm btn-secondary" onclick="fetchCurrency()" style="margin-top:8px;">🔄 Kurları Yenile</button>
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
         </div>
-
         <div id="page-settings" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:16px;">⚙️ Ayarlar</h3>
-            <!-- Ayarlar içeriği (kısaltılmış) -->
             <div class="settings-item">
                 <span class="label">🌓 Tema</span>
                 <select id="themeSelect" onchange="applyTheme()">
@@ -872,12 +830,12 @@
             </div>
             <div class="settings-item">
                 <span class="label">ℹ️ Hakkında</span>
-                <span style="color:var(--text-secondary);">v5.0 • iPhone Tab Bar</span>
+                <span style="color:var(--text-secondary);">v5.1 • Tüm ödemeler</span>
             </div>
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== MODALLAR (Ekleme ve Düzenleme) ===== -->
+        <!-- ===== MODALLAR ===== -->
         <div class="modal-overlay" id="addModal">
             <div class="modal-box">
                 <h2 id="addModalTitle">➕ Yeni Ödeme</h2>
@@ -969,53 +927,43 @@
         </div>
     </div>
 
-    <!-- ===== ALT TAB BAR (iPhone Tarzı) ===== -->
+    <!-- ===== ALT TAB BAR ===== -->
     <div class="tab-bar" id="tabBar">
         <button class="tab-item active" data-page="page-home" onclick="navigateTo('page-home')">
-            <span class="tab-icon">🏠</span>
-            <span class="tab-label">Ana</span>
+            <span class="tab-icon">🏠</span><span class="tab-label">Ana</span>
         </button>
         <button class="tab-item" data-page="page-aylik" onclick="navigateTo('page-aylik')">
-            <span class="tab-icon">📋</span>
-            <span class="tab-label">Aylık</span>
+            <span class="tab-icon">📋</span><span class="tab-label">Tümü</span>
         </button>
         <button class="tab-item" data-page="page-haftalik" onclick="navigateTo('page-haftalik')">
-            <span class="tab-icon">📅</span>
-            <span class="tab-label">Hafta</span>
+            <span class="tab-icon">📅</span><span class="tab-label">Hafta</span>
         </button>
         <button class="tab-item" data-page="page-gunluk" onclick="navigateTo('page-gunluk')">
-            <span class="tab-icon">📆</span>
-            <span class="tab-label">Bugün</span>
+            <span class="tab-icon">📆</span><span class="tab-label">Bugün</span>
         </button>
         <button class="tab-item" data-page="page-calendar" onclick="navigateTo('page-calendar')">
-            <span class="tab-icon">🗓️</span>
-            <span class="tab-label">Takvim</span>
+            <span class="tab-icon">🗓️</span><span class="tab-label">Takvim</span>
         </button>
         <button class="tab-item" data-page="page-charts" onclick="navigateTo('page-charts')">
-            <span class="tab-icon">📊</span>
-            <span class="tab-label">Grafik</span>
+            <span class="tab-icon">📊</span><span class="tab-label">Grafik</span>
         </button>
         <button class="tab-item" data-page="page-stats" onclick="navigateTo('page-stats')">
-            <span class="tab-icon">📈</span>
-            <span class="tab-label">İstatistik</span>
+            <span class="tab-icon">📈</span><span class="tab-label">İstatistik</span>
         </button>
         <button class="tab-item" data-page="page-categories" onclick="navigateTo('page-categories')">
-            <span class="tab-icon">🏷️</span>
-            <span class="tab-label">Kategoriler</span>
+            <span class="tab-icon">🏷️</span><span class="tab-label">Kategori</span>
         </button>
         <button class="tab-item" data-page="page-currency" onclick="navigateTo('page-currency')">
-            <span class="tab-icon">💱</span>
-            <span class="tab-label">Döviz</span>
+            <span class="tab-icon">💱</span><span class="tab-label">Döviz</span>
         </button>
         <button class="tab-item" data-page="page-settings" onclick="navigateTo('page-settings')">
-            <span class="tab-icon">⚙️</span>
-            <span class="tab-label">Ayarlar</span>
+            <span class="tab-icon">⚙️</span><span class="tab-label">Ayarlar</span>
         </button>
     </div>
 
     <script>
         // ================================================================
-        // VERİTABANI (IndexedDB) - KISALTILMIŞ (ÖNCEKİYLE AYNI)
+        // VERİTABANI (IndexedDB)
         // ================================================================
         const DB_NAME = 'OdemeDB';
         const STORE_NAME = 'odemeler';
@@ -1160,22 +1108,16 @@
         }
 
         // ================================================================
-        // SAYFA YÖNETİMİ (Tab Bar ile)
+        // SAYFA YÖNETİMİ
         // ================================================================
         function navigateTo(pageId) {
-            // Sayfayı göster
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-
-            // Tab bar'daki aktif öğeyi güncelle
             document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
             const activeTab = document.querySelector(`.tab-item[data-page="${pageId}"]`);
             if (activeTab) activeTab.classList.add('active');
-
-            // Geri butonunu göster/gizle (ana sayfa değilse)
             document.getElementById('globalBackBtn').style.display = (pageId === 'page-home') ? 'none' : 'block';
 
-            // Sayfa içeriğini render et
             if (pageId === 'page-aylik') renderAylik();
             else if (pageId === 'page-haftalik') renderHaftalik();
             else if (pageId === 'page-gunluk') renderGunluk();
@@ -1194,14 +1136,9 @@
             }
         }
 
-        // Eski showPage'i koru (butonlar için)
-        function showPage(pageId) {
-            navigateTo(pageId);
-        }
+        function showPage(pageId) { navigateTo(pageId); }
 
-        function goHome() {
-            navigateTo('page-home');
-        }
+        function goHome() { navigateTo('page-home'); }
 
         // ================================================================
         // ÖZET KARTLARI (sadece normal kategori)
@@ -1269,34 +1206,27 @@
         }
 
         // ================================================================
-        // AYLIK LİSTE (sadece içinde bulunulan ay, normal kategori)
+        // AYLIK LİSTE (TÜM ÖDEMELER) - DÜZELTİLDİ
         // ================================================================
         async function renderAylik() {
             try {
                 const payments = await getAllPayments();
-                const now = new Date();
-                const currentMonth = now.getMonth();
-                const currentYear = now.getFullYear();
                 const search = document.getElementById('searchInput').value.toLowerCase();
-                const filtered = payments.filter(p => {
-                    const pDate = new Date(p.date + 'T00:00:00');
-                    return (p.category === 'normal' || !p.category) &&
-                        pDate.getMonth() === currentMonth &&
-                        pDate.getFullYear() === currentYear &&
-                        (p.name.toLowerCase().includes(search) ||
-                            (p.category || '').toLowerCase().includes(search) ||
-                            (p.note || '').toLowerCase().includes(search) ||
-                            (p.amount || '').toString().includes(search) ||
-                            (p.currency || '').toLowerCase().includes(search));
-                }).sort((a, b) => new Date(a.date) - new Date(b.date));
+                const filtered = payments.filter(p =>
+                    p.name.toLowerCase().includes(search) ||
+                    (p.category || '').toLowerCase().includes(search) ||
+                    (p.note || '').toLowerCase().includes(search) ||
+                    (p.amount || '').toString().includes(search) ||
+                    (p.currency || '').toLowerCase().includes(search)
+                ).sort((a, b) => new Date(a.date) - new Date(b.date));
                 const container = document.getElementById('aylikList');
-                if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Bu ay normal ödeme yok</div>'; return; }
+                if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Hiç ödeme yok</div>'; return; }
                 container.innerHTML = filtered.map(p => renderPaymentItem(p, true)).join('');
             } catch (e) { showToast('❌ Hata: ' + e.message); }
         }
 
         // ================================================================
-        // DİĞER LİSTELER (KISALTILMIŞ - ÖNCEKİYLE AYNI)
+        // DİĞER LİSTELER (Haftalık, Günlük, Ödenen, Ödenmeyen, Büyük, Diğer)
         // ================================================================
         async function renderHaftalik() {
             try {
@@ -1400,7 +1330,6 @@
                 await updatePaymentDB(p);
                 showToast(p.paid ? '✅ Ödendi' : '↩️ Ödenmedi');
                 await renderSummary();
-                // Mevcut sayfayı yenile
                 const activePage = document.querySelector('.page.active');
                 if (activePage) {
                     const id = activePage.id;
@@ -1488,7 +1417,6 @@
                 document.getElementById('addAmount').value = '';
                 document.getElementById('addNote').value = '';
                 await renderSummary();
-                // Aktif sayfayı yenile
                 const activePage = document.querySelector('.page.active');
                 if (activePage) {
                     const id = activePage.id;
@@ -2268,7 +2196,6 @@
                 loadNotificationSettings();
                 loadBackground();
 
-                // Kategorileri oluştur
                 const categories = await getAllCategories();
                 if (categories.length === 0) {
                     for (const cat of defaultCategories) {
@@ -2276,7 +2203,6 @@
                     }
                 }
 
-                // Örnek veri
                 const payments = await getAllPayments();
                 if (payments.length === 0) {
                     const today = new Date().toISOString().split('T')[0];
