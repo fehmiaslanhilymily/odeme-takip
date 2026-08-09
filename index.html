@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <style>
-        /* ===== TÜM STILLER (ÖNCEKİYLE AYNI) ===== */
+        /* ===== DEĞİŞKENLER ===== */
         :root {
             --bg-primary: #f4f6f9;
             --bg-card: rgba(255, 255, 255, 0.85);
@@ -19,9 +19,9 @@
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
             --accent: #2d6a4f;
             --btn-radius: 30px;
-            --tab-height: 60px;
-            --gradient-start: #667eea;
-            --gradient-end: #764ba2;
+            --tab-height: 70px;
+            --tab-icon-size: 24px;
+            --tab-label-size: 11px;
         }
         [data-theme="dark"] {
             --bg-primary: #121212;
@@ -33,8 +33,6 @@
             --border-color: rgba(255, 255, 255, 0.05);
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
             --accent: #4caf50;
-            --gradient-start: #1a1a2e;
-            --gradient-end: #16213e;
         }
         * {
             box-sizing: border-box;
@@ -67,7 +65,7 @@
             flex-direction: column;
             border: 1px solid var(--border-color);
             position: relative;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
         }
         .header {
             display: flex;
@@ -318,7 +316,7 @@
         }
         .toast {
             position: fixed;
-            bottom: 90px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--text-primary);
@@ -517,6 +515,17 @@
             background: var(--bg-glass);
             color: var(--text-primary);
         }
+        .settings-item input[type="text"] {
+            flex: 1;
+            min-width: 60px;
+            padding: 6px 10px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            font-size: 14px;
+            text-align: center;
+        }
         .file-label {
             background: var(--accent);
             color: #fff;
@@ -560,15 +569,18 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 40px;
-            padding: 8px 12px;
+            padding: 10px 14px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid var(--border-color);
             display: flex;
-            gap: 4px;
+            gap: 6px;
             overflow-x: auto;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
             z-index: 100;
+            height: auto;
+            min-height: 70px;
+            align-items: center;
         }
         .tab-bar::-webkit-scrollbar {
             display: none;
@@ -578,25 +590,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 6px 10px;
+            justify-content: center;
+            padding: 8px 14px;
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.2s;
             color: var(--text-secondary);
-            font-size: 10px;
+            font-size: var(--tab-label-size);
             font-weight: 500;
             background: transparent;
             border: none;
-            min-width: 52px;
+            min-width: 60px;
             white-space: nowrap;
+            min-height: 56px;
         }
         .tab-item .tab-icon {
-            font-size: 22px;
+            font-size: var(--tab-icon-size);
             line-height: 1;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
         .tab-item .tab-label {
-            font-size: 9px;
+            font-size: var(--tab-label-size);
             line-height: 1;
         }
         .tab-item.active {
@@ -609,30 +623,26 @@
         @media (max-width: 480px) {
             #app {
                 padding: 16px 12px;
-                padding-bottom: 76px;
+                padding-bottom: 86px;
                 border-radius: 24px;
             }
             .tab-bar {
                 bottom: 12px;
                 width: calc(100% - 24px);
                 border-radius: 30px;
-                padding: 6px 8px;
+                padding: 8px 10px;
+                min-height: 62px;
             }
             .tab-item {
-                padding: 4px 6px;
-                min-width: 44px;
+                padding: 6px 10px;
+                min-width: 48px;
+                min-height: 48px;
             }
             .tab-item .tab-icon {
-                font-size: 18px;
+                font-size: 20px;
             }
             .tab-item .tab-label {
-                font-size: 8px;
-            }
-            .summary-grid {
-                gap: 8px;
-            }
-            .summary-card .value {
-                font-size: 18px;
+                font-size: 9px;
             }
             .toast {
                 bottom: 80px;
@@ -685,27 +695,35 @@
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:8px;">🔙 Ana Menü</button>
         </div>
 
-        <!-- ===== DİĞER SAYFALAR (Değişmedi) ===== -->
+        <!-- ===== HAFTALIK ===== -->
         <div id="page-haftalik" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📅 Bu Haftaki Ödemeler (Tümü)</h3>
             <div id="haftalikList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== GÜNLÜK ===== -->
         <div id="page-gunluk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📆 Bugünün Ödemeleri (Tümü)</h3>
             <div id="gunlukList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== ÖDENENLER ===== -->
         <div id="page-odenmis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">✅ Ödenenler (Normal)</h3>
             <div id="odenmisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== ÖDENMEYENLER ===== -->
         <div id="page-odenmemis" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">⏳ Ödenmeyenler (Normal - Gecikmiş)</h3>
             <div id="odenmemisList"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== BÜYÜK ===== -->
         <div id="page-buyuk" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💰 Büyük Ödemeler</h3>
             <div class="total-box" id="buyukTotal">Toplam: ₺0</div>
@@ -713,6 +731,8 @@
             <button class="btn btn-sm" onclick="showAddModalWithCategory('buyuk')" style="margin-top:8px;">➕ Yeni Büyük Ödeme</button>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== DİĞER ===== -->
         <div id="page-diger" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📌 Diğer Ödemeler</h3>
             <div class="total-box" id="digerTotal">Toplam: ₺0</div>
@@ -720,6 +740,8 @@
             <button class="btn btn-sm" onclick="showAddModalWithCategory('diger')" style="margin-top:8px;">➕ Yeni Diğer Ödeme</button>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== TAKVİM ===== -->
         <div id="page-calendar" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">🗓️ Takvim</h3>
             <div class="calendar" id="calendarContainer">
@@ -736,6 +758,8 @@
             <div id="calendarDayDetail" style="margin-top:12px;"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== GRAFİKLER ===== -->
         <div id="page-charts" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📊 Grafikler</h3>
             <div class="chart-container"><canvas id="chart30days"></canvas></div>
@@ -744,11 +768,15 @@
             <div class="chart-container"><canvas id="chart12months"></canvas></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== İSTATİSTİK ===== -->
         <div id="page-stats" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">📈 İstatistikler</h3>
             <div class="stat-grid" id="statsGrid"></div>
             <button class="btn btn-secondary" onclick="goHome()">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== KATEGORİLER ===== -->
         <div id="page-categories" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">🏷️ Kategoriler</h3>
             <div id="categoryList" style="margin-bottom:12px;"></div>
@@ -758,14 +786,20 @@
             </div>
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== DÖVİZ ===== -->
         <div id="page-currency" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:12px;">💱 Döviz Kurları <small style="font-size:12px;font-weight:400;color:var(--text-secondary);">(Genelpara.com)</small></h3>
             <div id="currencyList" class="currency-grid"></div>
             <button class="btn btn-sm btn-secondary" onclick="fetchCurrency()" style="margin-top:8px;">🔄 Kurları Yenile</button>
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px;">🔙 Ana Menü</button>
         </div>
+
+        <!-- ===== AYARLAR ===== -->
         <div id="page-settings" class="page">
             <h3 style="color:var(--text-primary);margin-bottom:16px;">⚙️ Ayarlar</h3>
+
+            <!-- Tema -->
             <div class="settings-item">
                 <span class="label">🌓 Tema</span>
                 <select id="themeSelect" onchange="applyTheme()">
@@ -774,15 +808,34 @@
                     <option value="system">Sistem</option>
                 </select>
             </div>
+
+            <!-- Ana Renk -->
             <div class="settings-item">
                 <span class="label">🎨 Ana Renk</span>
                 <input type="color" id="accentColor" value="#2d6a4f" onchange="applyAccentColor()">
             </div>
+
+            <!-- Buton Yuvarlaklığı -->
             <div class="settings-item">
                 <span class="label">🔘 Buton Yuvarlaklığı</span>
                 <input type="range" id="btnRadius" min="0" max="50" value="30" oninput="applyButtonStyle()">
                 <span id="btnRadiusVal">30px</span>
             </div>
+
+            <!-- TAB BAR RENK -->
+            <div class="settings-item">
+                <span class="label">🎨 Tab Bar Rengi</span>
+                <input type="color" id="tabColor" value="#2d6a4f" onchange="applyTabStyle()">
+            </div>
+
+            <!-- TAB BAR İKON (Emoji) -->
+            <div class="settings-item">
+                <span class="label">🔣 Tab İkonu</span>
+                <input type="text" id="tabIconInput" placeholder="🏠" maxlength="2" style="flex:1;min-width:60px;padding:6px 10px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-glass);color:var(--text-primary);font-size:20px;text-align:center;">
+                <button class="btn btn-sm" onclick="applyTabIcon()" style="width:auto;">Uygula</button>
+            </div>
+
+            <!-- Bildirimler -->
             <div class="settings-item">
                 <span class="label">🔔 Bildirimler</span>
                 <select id="notificationSelect" onchange="toggleNotifications()">
@@ -806,17 +859,23 @@
                     <option value="-1">Gecikti</option>
                 </select>
             </div>
+
+            <!-- Dışa Aktar -->
             <div class="settings-item">
                 <span class="label">📤 Dışa Aktar</span>
                 <button class="btn btn-sm" onclick="exportData('json')" style="width:auto;">JSON</button>
                 <button class="btn btn-sm" onclick="exportData('csv')" style="width:auto;">CSV</button>
             </div>
+
+            <!-- Yedekten Geri Yükle -->
             <div class="settings-item">
                 <span class="label">📥 Yedekten Geri Yükle</span>
                 <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="restoreData(event)">
                 <button class="btn btn-sm file-label" onclick="document.getElementById('restoreFileInput').click()">📁 Dosya Seç</button>
                 <span style="font-size:11px;color:var(--text-secondary);width:100%;">Web'deki verileri telefonda görmek için dışa aktarıp buradan yükleyin.</span>
             </div>
+
+            <!-- Arka Plan Görseli -->
             <div class="settings-item">
                 <span class="label">🖼️ Arka Plan Görseli</span>
                 <button class="btn btn-sm file-label" onclick="document.getElementById('bgImageInput').click()">📁 Galeriden Seç</button>
@@ -824,14 +883,19 @@
                 <button class="btn btn-sm btn-danger" onclick="removeBgImage()" style="width:auto;">Kaldır</button>
             </div>
             <div id="bgPreview" style="display:none; margin-bottom:10px;"><img id="bgPreviewImg" style="width:100%; max-height:100px; object-fit:cover; border-radius:12px;"></div>
+
+            <!-- Tüm Verileri Sil -->
             <div class="settings-item">
                 <span class="label">🗑️ Tüm Verileri Sil</span>
                 <button class="btn btn-sm btn-danger" onclick="clearAllData()">Sil</button>
             </div>
+
+            <!-- Hakkında -->
             <div class="settings-item">
                 <span class="label">ℹ️ Hakkında</span>
-                <span style="color:var(--text-secondary);">v5.1 • Tüm ödemeler</span>
+                <span style="color:var(--text-secondary);">v6.0 • Tab Bar Özelleştirme</span>
             </div>
+
             <button class="btn btn-secondary" onclick="goHome()" style="margin-top:12px;">🔙 Ana Menü</button>
         </div>
 
@@ -927,37 +991,47 @@
         </div>
     </div>
 
-    <!-- ===== ALT TAB BAR ===== -->
+    <!-- ===== ALT TAB BAR (BÜYÜTÜLDÜ, KAYDIRILABİLİR) ===== -->
     <div class="tab-bar" id="tabBar">
         <button class="tab-item active" data-page="page-home" onclick="navigateTo('page-home')">
-            <span class="tab-icon">🏠</span><span class="tab-label">Ana</span>
+            <span class="tab-icon" id="tabIconHome">🏠</span>
+            <span class="tab-label">Ana</span>
         </button>
         <button class="tab-item" data-page="page-aylik" onclick="navigateTo('page-aylik')">
-            <span class="tab-icon">📋</span><span class="tab-label">Tümü</span>
+            <span class="tab-icon" id="tabIconAylik">📋</span>
+            <span class="tab-label">Tümü</span>
         </button>
         <button class="tab-item" data-page="page-haftalik" onclick="navigateTo('page-haftalik')">
-            <span class="tab-icon">📅</span><span class="tab-label">Hafta</span>
+            <span class="tab-icon" id="tabIconHaftalik">📅</span>
+            <span class="tab-label">Hafta</span>
         </button>
         <button class="tab-item" data-page="page-gunluk" onclick="navigateTo('page-gunluk')">
-            <span class="tab-icon">📆</span><span class="tab-label">Bugün</span>
+            <span class="tab-icon" id="tabIconGunluk">📆</span>
+            <span class="tab-label">Bugün</span>
         </button>
         <button class="tab-item" data-page="page-calendar" onclick="navigateTo('page-calendar')">
-            <span class="tab-icon">🗓️</span><span class="tab-label">Takvim</span>
+            <span class="tab-icon" id="tabIconCalendar">🗓️</span>
+            <span class="tab-label">Takvim</span>
         </button>
         <button class="tab-item" data-page="page-charts" onclick="navigateTo('page-charts')">
-            <span class="tab-icon">📊</span><span class="tab-label">Grafik</span>
+            <span class="tab-icon" id="tabIconCharts">📊</span>
+            <span class="tab-label">Grafik</span>
         </button>
         <button class="tab-item" data-page="page-stats" onclick="navigateTo('page-stats')">
-            <span class="tab-icon">📈</span><span class="tab-label">İstatistik</span>
+            <span class="tab-icon" id="tabIconStats">📈</span>
+            <span class="tab-label">İstatistik</span>
         </button>
         <button class="tab-item" data-page="page-categories" onclick="navigateTo('page-categories')">
-            <span class="tab-icon">🏷️</span><span class="tab-label">Kategori</span>
+            <span class="tab-icon" id="tabIconCategories">🏷️</span>
+            <span class="tab-label">Kategori</span>
         </button>
         <button class="tab-item" data-page="page-currency" onclick="navigateTo('page-currency')">
-            <span class="tab-icon">💱</span><span class="tab-label">Döviz</span>
+            <span class="tab-icon" id="tabIconCurrency">💱</span>
+            <span class="tab-label">Döviz</span>
         </button>
         <button class="tab-item" data-page="page-settings" onclick="navigateTo('page-settings')">
-            <span class="tab-icon">⚙️</span><span class="tab-label">Ayarlar</span>
+            <span class="tab-icon" id="tabIconSettings">⚙️</span>
+            <span class="tab-label">Ayarlar</span>
         </button>
     </div>
 
@@ -1206,7 +1280,7 @@
         }
 
         // ================================================================
-        // AYLIK LİSTE (TÜM ÖDEMELER) - DÜZELTİLDİ
+        // AYLIK LİSTE (TÜM ÖDEMELER)
         // ================================================================
         async function renderAylik() {
             try {
@@ -1226,7 +1300,7 @@
         }
 
         // ================================================================
-        // DİĞER LİSTELER (Haftalık, Günlük, Ödenen, Ödenmeyen, Büyük, Diğer)
+        // DİĞER LİSTELER (Kısaltılmış)
         // ================================================================
         async function renderHaftalik() {
             try {
@@ -1866,6 +1940,62 @@
         }
 
         // ================================================================
+        // TAB BAR ÖZELLEŞTİRME (Renk + İkon)
+        // ================================================================
+        function applyTabStyle() {
+            const color = document.getElementById('tabColor').value;
+            document.documentElement.style.setProperty('--accent', color);
+            localStorage.setItem('tabColor', color);
+            // Tab bar aktif renklerini güncelle
+            document.querySelectorAll('.tab-item.active').forEach(el => {
+                el.style.color = color;
+            });
+            showToast('✅ Tab rengi güncellendi');
+        }
+
+        function loadTabStyle() {
+            const color = localStorage.getItem('tabColor') || '#2d6a4f';
+            document.getElementById('tabColor').value = color;
+            document.documentElement.style.setProperty('--accent', color);
+        }
+
+        function applyTabIcon() {
+            const icon = document.getElementById('tabIconInput').value.trim();
+            if (!icon) { showToast('❌ Bir emoji girin'); return; }
+            // Tüm tab ikonlarını değiştir (isteğe bağlı, sadece aktif olanı değiştirmek için)
+            // Bu örnekte sadece aktif sayfanın ikonunu değiştiriyoruz
+            const activePage = document.querySelector('.page.active');
+            if (!activePage) { showToast('❌ Bir sayfa açık değil'); return; }
+            const pageId = activePage.id;
+            const tab = document.querySelector(`.tab-item[data-page="${pageId}"]`);
+            if (!tab) { showToast('❌ Tab bulunamadı'); return; }
+            const iconSpan = tab.querySelector('.tab-icon');
+            if (iconSpan) {
+                iconSpan.textContent = icon;
+                // Kaydet
+                const savedIcons = JSON.parse(localStorage.getItem('tabIcons') || '{}');
+                savedIcons[pageId] = icon;
+                localStorage.setItem('tabIcons', JSON.stringify(savedIcons));
+                showToast('✅ Tab ikonu güncellendi');
+            } else {
+                showToast('❌ İkon alanı bulunamadı');
+            }
+        }
+
+        function loadTabIcons() {
+            const savedIcons = JSON.parse(localStorage.getItem('tabIcons') || '{}');
+            Object.keys(savedIcons).forEach(pageId => {
+                const tab = document.querySelector(`.tab-item[data-page="${pageId}"]`);
+                if (tab) {
+                    const iconSpan = tab.querySelector('.tab-icon');
+                    if (iconSpan) {
+                        iconSpan.textContent = savedIcons[pageId];
+                    }
+                }
+            });
+        }
+
+        // ================================================================
         // ARKA PLAN GÖRSELİ
         // ================================================================
         function loadBackground() {
@@ -2195,6 +2325,8 @@
                 loadButtonStyle();
                 loadNotificationSettings();
                 loadBackground();
+                loadTabStyle();
+                loadTabIcons();
 
                 const categories = await getAllCategories();
                 if (categories.length === 0) {
