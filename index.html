@@ -43,10 +43,10 @@
             </div>
         </div>
 
-        <!-- İÇERİK ALANI (KAYDIRILABİLİR) -->
+        <!-- İÇERİK ALANI -->
         <div id="main-content" class="flex-1 overflow-y-auto p-5 space-y-4 pb-24">
             
-            <!-- ÖZET KARTLARI (GRID) -->
+            <!-- ÖZET KARTLARI -->
             <div class="grid grid-cols-2 gap-3">
                 <div onclick="showDetail('today')" class="custom-card p-3.5 rounded-2xl cursor-pointer hover:border-emerald-500/50 transition group">
                     <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
@@ -155,6 +155,41 @@
         </div>
     </div>
 
+    <!-- ÖN İZLEME MODALI (DETAYLI GÖRÜNÜM) -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+        <div class="w-full max-w-sm custom-card p-6 rounded-3xl border border-slate-700 shadow-2xl space-y-4 relative">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2"><i class="fa-solid fa-circle-info text-emerald-400"></i> İşlem Ön İzleme</h3>
+                <button onclick="closePreviewModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <span class="text-slate-400 block mb-0.5">İşlem Başlığı</span>
+                    <div id="prev-title" class="font-semibold text-slate-200 text-sm"></div>
+                </div>
+                <div>
+                    <span class="text-slate-400 block mb-0.5">Açıklama / Detay</span>
+                    <div id="prev-desc" class="text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <span class="text-slate-400 block mb-0.5">Tutar</span>
+                        <div id="prev-amount" class="font-bold text-emerald-400 text-sm"></div>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mb-0.5">Vade / Tarih</span>
+                        <div id="prev-date" class="font-medium text-slate-200"></div>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-slate-400 block mb-0.5">Ödeme Durumu</span>
+                    <div id="prev-status" class="inline-block px-3 py-1 rounded-full font-medium"></div>
+                </div>
+            </div>
+            <button onclick="closePreviewModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-semibold text-xs transition mt-2">Kapat</button>
+        </div>
+    </div>
+
     <!-- YENİ ÖDEME EKLEME MODALI -->
     <div id="add-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
         <div class="w-full max-w-sm custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
@@ -164,8 +199,12 @@
             </div>
             <form id="add-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
                 <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">İşlem / Ödeme Adı (Açıklama)</label>
-                    <input type="text" id="pay-title" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Örn: Kira, Elektrik Faturası">
+                    <label class="block text-[11px] text-slate-400 mb-1">İşlem / Ödeme Adı</label>
+                    <input type="text" id="pay-title" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Örn: Kira, Elektrik">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Açıklama / Detay</label>
+                    <textarea id="pay-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="İşlem ile ilgili detaylı açıklama..."></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -179,10 +218,10 @@
                 </div>
                 <div>
                     <label class="block text-[11px] text-slate-400 mb-1">Kategori</label>
-                    <select id="pay-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
-                        <option value="normal">Normal Ödeme (Tüm Ödemelere İşlenir)</option>
-                        <option value="large">Büyük Ödeme (Sadece burada görünür)</option>
-                        <option value="other">Diğer Ödeme (Sadece burada görünür)</option>
+                    <select id="pay-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none">
+                        <option value="normal">Normal Ödeme (Tüm Ödemeler)</option>
+                        <option value="large">Büyük Ödeme (Sadece burada)</option>
+                        <option value="other">Diğer Ödeme (Sadece burada)</option>
                     </select>
                 </div>
                 <div class="flex items-center gap-2 pt-1">
@@ -203,7 +242,7 @@
             </div>
             <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Tarih Seçin</label>
-                <input type="date" id="calendar-picker" onchange="loadCalendarDay(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                <input type="date" id="calendar-picker" onchange="loadCalendarDay(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none">
             </div>
             <div id="calendar-day-list" class="max-h-60 overflow-y-auto space-y-2">
                 <p class="text-center text-xs text-slate-500 py-4">Lütfen bir tarih seçin.</p>
@@ -218,9 +257,9 @@
                 <h3 class="font-bold text-slate-100 text-sm">PDF'den Otomatik İşlem Yükle</h3>
                 <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-xs text-slate-400">Ödeme dökümü içeren PDF dosyanızı seçin. İçindeki tarihler, açıklamalar ve tutarlar tam olarak taranıp "Tüm Ödemeler" kısmına tarih sırasıyla eklenecektir.</p>
+            <p class="text-xs text-slate-400">PDF dosyanızı seçin. Tarihler, tutarlar ve açıklamalar eksiksiz taranarak tarih sırasına göre eklenecektir.</p>
             <input type="file" id="pdf-file-input" accept=".pdf" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
-            <button onclick="processUploadedPDF()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition shadow-lg">PDF'i Tara ve İşlemleri Ekle</button>
+            <button onclick="processUploadedPDF()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition shadow-lg">PDF'i Tara ve İşle</button>
         </div>
     </div>
 
@@ -238,7 +277,7 @@
                 </div>
                 <div>
                     <label class="block text-[11px] text-slate-400 mb-1">Galeriden Arka Plan Resmi Seç</label>
-                    <input type="file" id="setting-bg-img" accept="image/*" onchange="changeBgImage(this)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-white hover:file:bg-slate-700">
+                    <input type="file" id="setting-bg-img" accept="image/*" onchange="changeBgImage(this)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-white">
                 </div>
                 <div>
                     <label class="block text-[11px] text-slate-400 mb-1">Yazı Rengi</label>
@@ -256,12 +295,12 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT MANTIK VE İŞLEYİŞİ -->
+    <!-- JAVASCRIPT -->
     <script>
         let payments = JSON.parse(localStorage.getItem('hily_payments')) || [
-            { id: 1, title: 'Dükkan Kirası', amount: 15000, date: new Date().toISOString().split('T')[0], status: false, category: 'normal' },
-            { id: 2, title: 'Makine Bakımı', amount: 7500, date: new Date().toISOString().split('T')[0], status: true, category: 'large' },
-            { id: 3, title: 'Kargo Malzemesi', amount: 1200, date: new Date().toISOString().split('T')[0], status: false, category: 'other' }
+            { id: 1, title: 'Dükkan Kirası', description: 'Ekim ayı iş yeri kira ödemesi', amount: 15000, date: '2026-10-27', status: false, category: 'normal' },
+            { id: 2, title: 'Makine Bakımı', description: 'Tekstil makineleri yıllık bakım ücreti', amount: 7500, date: '2026-10-25', status: true, category: 'large' },
+            { id: 3, title: 'Kargo Malzemesi', description: 'Koli ve bant tedariği', amount: 1200, date: '2026-10-26', status: false, category: 'other' }
         ];
 
         let appSettings = JSON.parse(localStorage.getItem('hily_settings')) || {
@@ -284,6 +323,7 @@
             updateDashboardCards();
         }
 
+        // Tarihe göre kronolojik sıralama (Yeniden eskiye veya eskiden yeniye)
         function sortPaymentsByDate() {
             payments.sort((a, b) => new Date(a.date) - new Date(b.date));
         }
@@ -407,7 +447,7 @@
                     return p.category === 'normal' && pDate >= monday && pDate <= sunday && !p.status;
                 });
             } else if (type === 'all') {
-                titleText = 'Tüm Ödemeler (Bu Ay)';
+                titleText = 'Tüm Ödemeler (Ay / Tarih Sıralı)';
                 filtered = payments.filter(p => p.category === 'normal');
             } else if (type === 'paid') {
                 titleText = 'Ödenen İşlemler';
@@ -438,25 +478,47 @@
 
             filtered.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = "custom-card p-3.5 rounded-2xl flex items-center justify-between border border-slate-800";
+                itemDiv.className = "custom-card p-3.5 rounded-2xl flex items-center justify-between border border-slate-800 hover:border-slate-600 transition cursor-pointer";
                 itemDiv.innerHTML = `
-                    <div class="space-y-1">
+                    <div onclick="openPreview(${item.id})" class="space-y-1 flex-1 pr-2">
                         <div class="text-sm font-semibold text-slate-200">${item.title}</div>
-                        <div class="text-[11px] text-slate-400 flex items-center gap-2">
+                        <div class="text-[11px] text-slate-400 line-clamp-1">${item.description || 'Açıklama girilmemiş'}</div>
+                        <div class="text-[10px] text-slate-500 flex items-center gap-2 pt-0.5">
                             <span><i class="fa-regular fa-calendar mr-1"></i>${formatDate(item.date)}</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] ${item.status ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${item.status ? 'Ödendi' : 'Ödenmedi'}</span>
+                            <span class="px-2 py-0.5 rounded-full ${item.status ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${item.status ? 'Ödendi' : 'Ödenmedi'}</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold text-slate-100">${formatCurrency(item.amount)}</span>
+                        <span onclick="openPreview(${item.id})" class="text-sm font-bold text-slate-100">${formatCurrency(item.amount)}</span>
                         <div class="flex flex-col gap-1">
-                            <button onclick="toggleStatus(${item.id})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition"><i class="fa-solid ${item.status ? 'fa-rotate-left text-amber-400' : 'fa-check text-emerald-400'}"></i></button>
-                            <button onclick="deletePayment(${item.id})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-900/50 text-rose-400 flex items-center justify-center text-xs transition"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="toggleStatus(event, ${item.id})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition"><i class="fa-solid ${item.status ? 'fa-rotate-left text-amber-400' : 'fa-check text-emerald-400'}"></i></button>
+                            <button onclick="deletePayment(event, ${item.id})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-900/50 text-rose-400 flex items-center justify-center text-xs transition"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
                 listEl.appendChild(itemDiv);
             });
+        }
+
+        // ÖN İZLEME MODALINI AÇ
+        function openPreview(id) {
+            const item = payments.find(p => p.id === id);
+            if (!item) return;
+
+            document.getElementById('prev-title').innerText = item.title;
+            document.getElementById('prev-desc').innerText = item.description || 'Detaylı açıklama bulunmuyor.';
+            document.getElementById('prev-amount').innerText = formatCurrency(item.amount);
+            document.getElementById('prev-date').innerText = formatDate(item.date);
+            
+            const statusEl = document.getElementById('prev-status');
+            statusEl.innerText = item.status ? 'Ödendi' : 'Ödenmedi';
+            statusEl.className = `inline-block px-3 py-1 rounded-full font-medium text-xs ${item.status ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`;
+
+            document.getElementById('preview-modal').classList.remove('hidden');
+        }
+
+        function closePreviewModal() {
+            document.getElementById('preview-modal').classList.add('hidden');
         }
 
         function closeModal() { document.getElementById('detail-modal').classList.add('hidden'); updateDashboardCards(); }
@@ -473,6 +535,7 @@
             payments.push({
                 id: Date.now(),
                 title: document.getElementById('pay-title').value,
+                description: document.getElementById('pay-desc').value,
                 amount: parseFloat(document.getElementById('pay-amount').value),
                 date: document.getElementById('pay-date').value,
                 category: document.getElementById('pay-category').value,
@@ -486,7 +549,8 @@
             else showDetail('all');
         }
 
-        function toggleStatus(id) {
+        function toggleStatus(e, id) {
+            e.stopPropagation();
             const item = payments.find(p => p.id === id);
             if (item) {
                 item.status = !item.status;
@@ -503,7 +567,8 @@
             }
         }
 
-        function deletePayment(id) {
+        function deletePayment(e, id) {
+            e.stopPropagation();
             if (confirm('Silmek istediğinize emin misiniz?')) {
                 payments = payments.filter(p => p.id !== id);
                 saveData();
@@ -528,11 +593,12 @@
             }
             dayPayments.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = "custom-card p-3 rounded-xl flex items-center justify-between border border-slate-800";
+                itemDiv.className = "custom-card p-3 rounded-xl flex items-center justify-between border border-slate-800 cursor-pointer";
+                itemDiv.onclick = () => openPreview(item.id);
                 itemDiv.innerHTML = `
                     <div>
                         <div class="text-xs font-semibold text-slate-200">${item.title}</div>
-                        <div class="text-[10px] text-slate-400">${item.category.toUpperCase()} - ${item.status ? 'Ödendi' : 'Ödenmedi'}</div>
+                        <div class="text-[10px] text-slate-400">${item.description || ''}</div>
                     </div>
                     <span class="text-xs font-bold text-slate-100">${formatCurrency(item.amount)}</span>
                 `;
@@ -543,7 +609,7 @@
         function openUploadModal() { document.getElementById('upload-modal').classList.remove('hidden'); }
         function closeUploadModal() { document.getElementById('upload-modal').classList.add('hidden'); }
 
-        // MÜKEMMEL VE HATASIZ PDF SATIR AYRIŞTIRICI
+        // MÜKEMMEL PDF TARAYICI VE AÇIKLAMA AYIRICI
         async function processUploadedPDF() {
             const fileInput = document.getElementById('pdf-file-input');
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -562,35 +628,28 @@
                     for (let i = 1; i <= pdf.numPages; i++) {
                         const page = await pdf.getPage(i);
                         const textContent = await page.getTextContent();
-                        
-                        // Metin öğelerini sırasıyla alalım
                         let items = textContent.items.map(item => item.str.trim()).filter(str => str.length > 0);
                         
-                        // Satır içindeki verileri taramak için döngü
                         for (let j = 0; j < items.length; j++) {
                             let currentStr = items[j];
-
-                            // 1. Önce tarih formatı arayalım (GG.AA.YYYY veya GG/AA/YYYY)
                             let dateMatch = currentStr.match(/(\d{2})[\.\/](\d{2})[\.\/](\d{4})/);
+                            
                             if (dateMatch) {
                                 let dateStr = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
-                                let title = "İşlem / Ödeme";
+                                let title = "PDF İşlemi";
+                                let description = "";
                                 let amount = 0;
 
-                                // Tarihin etrafındaki alanlardan açıklama ve tutar bulmaya çalışalım
-                                for (let k = Math.max(0, j - 2); k <= Math.min(items.length - 1, j + 5); k++) {
+                                for (let k = Math.max(0, j - 2); k <= Math.min(items.length - 1, j + 6); k++) {
                                     let checkStr = items[k];
-                                    
-                                    // Tutar kontrolü (Örn: 1.500,00 veya 250,00)
                                     let amountMatch = checkStr.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/);
+                                    
                                     if (amountMatch && amount === 0) {
                                         amount = parseFloat(amountMatch[1].replace(/\./g, '').replace(',', '.'));
-                                    }
-
-                                    // Açıklama kontrolü (Tarih ve tutar dışındaki metinler)
-                                    if (k !== j && !checkStr.match(/(\d{2})[\.\/](\d{2})[\.\/](\d{4})/) && !checkStr.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/)) {
+                                    } else if (k !== j && !checkStr.match(/(\d{2})[\.\/](\d{2})[\.\/](\d{4})/) && !checkStr.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/)) {
                                         if (checkStr.length > 3) {
-                                            title = checkStr;
+                                            if (!title || title === "PDF İşlemi") title = checkStr;
+                                            else description += checkStr + " ";
                                         }
                                     }
                                 }
@@ -599,6 +658,7 @@
                                     extractedItems.push({
                                         id: Date.now() + Math.random(),
                                         title: title,
+                                        description: description.trim() || 'PDF dökümünden aktarıldı.',
                                         amount: amount,
                                         date: dateStr,
                                         status: false,
@@ -613,7 +673,7 @@
                         payments.push(...extractedItems);
                         saveData();
                         closeUploadModal();
-                        alert(`${extractedItems.length} adet işlem PDF'den başarıyla tarandı, açıklamaları ve tarihleriyle birlikte "Tüm Ödemeler" listesine eklendi!`);
+                        alert(`${extractedItems.length} adet işlem PDF'den başarıyla tarandı ve tarihlerine göre eklendi!`);
                         showDetail('all');
                     } else {
                         alert('PDF içerisinde uygun formatta tarih ve tutar eşleşmesi bulunamadı.');
@@ -629,7 +689,7 @@
 
         function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
         function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
-        function goHome() { closeModal(); closeCalendarModal(); closeUploadModal(); closeSettingsModal(); }
+        function goHome() { closeModal(); closeCalendarModal(); closeUploadModal(); closeSettingsModal(); closePreviewModal(); }
     </script>
 </body>
 </html>
