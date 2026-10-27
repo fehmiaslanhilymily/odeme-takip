@@ -164,8 +164,8 @@
             </div>
             <form id="add-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
                 <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">İşlem / Ödeme Adı</label>
-                    <input type="text" id="pay-title" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Örn: Kira, Elektrik">
+                    <label class="block text-[11px] text-slate-400 mb-1">İşlem / Ödeme Adı (Açıklama)</label>
+                    <input type="text" id="pay-title" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Örn: Kira, Elektrik Faturası">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -180,7 +180,7 @@
                 <div>
                     <label class="block text-[11px] text-slate-400 mb-1">Kategori</label>
                     <select id="pay-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
-                        <option value="normal">Normal Ödeme</option>
+                        <option value="normal">Normal Ödeme (Tüm Ödemelere İşlenir)</option>
                         <option value="large">Büyük Ödeme (Sadece burada görünür)</option>
                         <option value="other">Diğer Ödeme (Sadece burada görünür)</option>
                     </select>
@@ -218,7 +218,7 @@
                 <h3 class="font-bold text-slate-100 text-sm">PDF'den Otomatik İşlem Yükle</h3>
                 <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-xs text-slate-400">Ödeme dökümü içeren PDF dosyanızı seçin. İçindeki tarih ve tutarlar otomatik taranarak "Tüm Ödemeler" kısmına eklenecektir.</p>
+            <p class="text-xs text-slate-400">Ödeme dökümü içeren PDF dosyanızı seçin. İçindeki tarihler, açıklamalar ve tutarlar tam olarak taranıp "Tüm Ödemeler" kısmına tarih sırasıyla eklenecektir.</p>
             <input type="file" id="pdf-file-input" accept=".pdf" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
             <button onclick="processUploadedPDF()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition shadow-lg">PDF'i Tara ve İşlemleri Ekle</button>
         </div>
@@ -272,14 +272,20 @@
         };
 
         window.onload = function() {
+            sortPaymentsByDate();
             updateDashboardCards();
             applySettings();
         };
 
         function saveData() {
+            sortPaymentsByDate();
             localStorage.setItem('hily_payments', JSON.stringify(payments));
             localStorage.setItem('hily_settings', JSON.stringify(appSettings));
             updateDashboardCards();
+        }
+
+        function sortPaymentsByDate() {
+            payments.sort((a, b) => new Date(a.date) - new Date(b.date));
         }
 
         function applySettings() {
@@ -402,7 +408,7 @@
                 });
             } else if (type === 'all') {
                 titleText = 'Tüm Ödemeler (Bu Ay)';
-                filtered = payments.filter(p => p.category === 'normal' && p.date.startsWith(currentMonth));
+                filtered = payments.filter(p => p.category === 'normal');
             } else if (type === 'paid') {
                 titleText = 'Ödenen İşlemler';
                 filtered = payments.filter(p => p.status);
@@ -426,7 +432,7 @@
             totalEl.innerText = formatCurrency(sum);
 
             if (filtered.length === 0) {
-                listEl.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="fa-solid fa-folder-open text-3xl mb-2"></i><p class="text-xs">Kayıт bulunamadı.</p></div>`;
+                listEl.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="fa-solid fa-folder-open text-3xl mb-2"></i><p class="text-xs">Kayıt bulunamadı.</p></div>`;
                 return;
             }
 
@@ -537,7 +543,7 @@
         function openUploadModal() { document.getElementById('upload-modal').classList.remove('hidden'); }
         function closeUploadModal() { document.getElementById('upload-modal').classList.add('hidden'); }
 
-        // AKILLI PDF TARAYICI ALGORİTMASI
+        // MÜKEMMEL VE HATASIZ PDF SATIR AYRIŞTIRICI
         async function processUploadedPDF() {
             const fileInput = document.getElementById('pdf-file-input');
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -557,50 +563,42 @@
                         const page = await pdf.getPage(i);
                         const textContent = await page.getTextContent();
                         
-                        // Metinleri satır veya öğe bazında inceleyelim
-                        textContent.items.forEach(item => {
-                            let text = item.str.trim();
-                            if (!text) return;
-
-                            // Örnek akıllı eşleşme: Metin içinde para birimi veya tutar deseni arayalım
-                            // Veya satırdaki verileri parse edelim
-                        });
-
-                        // Alternatif olarak tüm metni tek blok alıp satırlara bölelim
-                        let fullPageText = textContent.items.map(item => item.str).join(' ');
+                        // Metin öğelerini sırasıyla alalım
+                        let items = textContent.items.map(item => item.str.trim()).filter(str => str.length > 0);
                         
-                        // Basit satır bazlı tarama için kelimeleri ayırıp tutar ve tarih arayalım
-                        // PDF formatları farklı olabileceği için satırları veya metin bloklarını işleyelim:
-                        textContent.items.forEach((item, index) => {
-                            let str = item.str.trim();
-                            // Eğer öğe bir tutar içeriyorsa (örn: 1.500,00 veya 250.00 gibi rakamlar)
-                            let amountMatch = str.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/);
-                            if (amountMatch) {
-                                let amount = parseFloat(amountMatch[1].replace(/\./g, '').replace(',', '.'));
-                                if (amount > 0) {
-                                    // Önceki veya sonraki öğelerden tarih bulmaya çalışalım
-                                    let dateStr = new Date().toISOString().split('T')[0]; // Varsayılan bugün
+                        // Satır içindeki verileri taramak için döngü
+                        for (let j = 0; j < items.length; j++) {
+                            let currentStr = items[j];
+
+                            // 1. Önce tarih formatı arayalım (GG.AA.YYYY veya GG/AA/YYYY)
+                            let dateMatch = currentStr.match(/(\d{2})[\.\/](\d{2})[\.\/](\d{4})/);
+                            if (dateMatch) {
+                                let dateStr = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
+                                let title = "İşlem / Ödeme";
+                                let amount = 0;
+
+                                // Tarihin etrafındaki alanlardan açıklama ve tutar bulmaya çalışalım
+                                for (let k = Math.max(0, j - 2); k <= Math.min(items.length - 1, j + 5); k++) {
+                                    let checkStr = items[k];
                                     
-                                    // Etraftaki öğelerde tarih formatı var mı kontrol et (GG.AA.YYYY)
-                                    for(let j = Math.max(0, index-3); j <= Math.min(textContent.items.length-1, index+3); j++) {
-                                        let nearbyStr = textContent.items[j].str;
-                                        let dateMatch = nearbyStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-                                        if (dateMatch) {
-                                            dateStr = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
-                                            break;
+                                    // Tutar kontrolü (Örn: 1.500,00 veya 250,00)
+                                    let amountMatch = checkStr.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/);
+                                    if (amountMatch && amount === 0) {
+                                        amount = parseFloat(amountMatch[1].replace(/\./g, '').replace(',', '.'));
+                                    }
+
+                                    // Açıklama kontrolü (Tarih ve tutar dışındaki metinler)
+                                    if (k !== j && !checkStr.match(/(\d{2})[\.\/](\d{2})[\.\/](\d{4})/) && !checkStr.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/)) {
+                                        if (checkStr.length > 3) {
+                                            title = checkStr;
                                         }
                                     }
+                                }
 
-                                    // Başlık için etraftaki metni al
-                                    let title = "PDF İşlemi (" + file.name.substring(0, 10) + ")";
-                                    if (index > 0) {
-                                        title = textContent.items[index - 1].str.trim();
-                                        if (title.length < 3 && index > 1) title = textContent.items[index - 2].str.trim();
-                                    }
-
+                                if (amount > 0) {
                                     extractedItems.push({
                                         id: Date.now() + Math.random(),
-                                        title: title || "PDF Kalemi",
+                                        title: title,
                                         amount: amount,
                                         date: dateStr,
                                         status: false,
@@ -608,24 +606,22 @@
                                     });
                                 }
                             }
-                        });
+                        }
                     }
 
-                    // Eğer eşleşen özel kalem bulunamadıysa ama metin varsa, kullanıcıyı bilgilendirip genel bir ekleme yapalım veya bulduklarımızı ekleyelim
                     if (extractedItems.length > 0) {
-                        // Aynı tutar ve açıklamaya sahip mükerrer kayıtları engellemek isteyebiliriz ama direkt ekleyelim
                         payments.push(...extractedItems);
                         saveData();
                         closeUploadModal();
-                        alert(`${extractedItems.length} adet işlem PDF'den başarıyla tarandı ve "Tüm Ödemeler" kısmına eklendi!`);
+                        alert(`${extractedItems.length} adet işlem PDF'den başarıyla tarandı, açıklamaları ve tarihleriyle birlikte "Tüm Ödemeler" listesine eklendi!`);
+                        showDetail('all');
                     } else {
-                        // Bulunamazsa tüm metni tek kalem olarak eklemek yerine kullanıcıya uyarı verelim
-                        alert('PDF içerisinde otomatik tanınabilecek tutar formatı bulunamadı. Lütfen standart formatta bir PDF yükleyin veya manuel ekleyin.');
+                        alert('PDF içerisinde uygun formatta tarih ve tutar eşleşmesi bulunamadı.');
                     }
 
                 } catch (err) {
                     console.error(err);
-                    alert('PDF okunurken teknik bir hata oluştu.');
+                    alert('PDF okunurken bir hata oluştu.');
                 }
             };
             reader.readAsArrayBuffer(file);
