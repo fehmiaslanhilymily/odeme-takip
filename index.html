@@ -15,30 +15,74 @@
             background-color: #0f172a;
             color: #f8fafc;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
         }
         .custom-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.9));
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
             border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
+        }
+
+        /* Weather Animations */
+        .weather-rain, .weather-snow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+        .drop {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+        .rain-drop { width: 1px; height: 18px; }
+        .snow-drop { width: 6px; height: 6px; border-radius: 50%; }
+
+        @keyframes fall {
+            0% { transform: translateY(-20px); }
+            100% { transform: translateY(100vh); }
+        }
+
+        /* Sunny effect */
+        .sunny-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 40%, #854d0e 100%) !important;
+        }
+        .rainy-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%) !important;
+        }
+        .snowy-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 60%, #1e3a8a 100%) !important;
         }
     </style>
 </head>
-<body id="app-body" class="flex justify-center items-center min-h-screen p-2 sm:p-4 bg-cover bg-center" style="background-color: #0f172a;">
+<body id="app-body" class="flex justify-center items-center min-h-screen p-2 sm:p-4 bg-cover bg-center transition-colors duration-1000">
+
+    <!-- Dinamik Hava Durumu Efekt Alanı -->
+    <div id="weather-effect-container"></div>
 
     <!-- Mobil Çerçeve Kapsayıcısı -->
-    <div class="w-full max-w-md h-[92vh] max-h-[850px] custom-card rounded-3xl flex flex-col overflow-hidden shadow-2xl relative border border-slate-700/50">
+    <div class="w-full max-w-md h-[92vh] max-h-[850px] custom-card rounded-3xl flex flex-col overflow-hidden shadow-2xl relative border border-slate-700/50 z-10">
         
         <!-- ÜST BAŞLIK -->
-        <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-slate-800/80">
-            <h1 id="app-title" class="text-xl font-bold tracking-wide flex items-center gap-2 text-slate-100">
-                <i class="fa-solid fa-calendar-days text-emerald-400"></i> Ödeme <span class="text-slate-400 font-normal">Takip</span>
-            </h1>
+        <div class="px-6 pt-5 pb-3 flex items-center justify-between border-b border-slate-800/80">
             <div class="flex items-center gap-2">
+                <h1 id="app-title" class="text-lg font-bold tracking-wide text-slate-100 flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-days text-emerald-400"></i> Ödeme <span class="text-slate-400 font-normal">Takip</span>
+                </h1>
+                <!-- Hava Durumu Rozeti -->
+                <span id="weather-badge" class="text-[10px] bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700 flex items-center gap-1">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="requestNotificationPermission()" title="Bildirimleri Aç" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 flex items-center justify-center text-xs transition">
+                    <i class="fa-solid fa-bell"></i>
+                </button>
                 <button onclick="openSettingsModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition">
                     <i class="fa-solid fa-gear"></i>
                 </button>
-                <button onclick="openAddModal('normal')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg shadow-emerald-900/30 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-plus"></i> Yeni Ekle
+                <button onclick="openAddModal('normal')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold shadow-lg shadow-emerald-900/30 transition flex items-center gap-1">
+                    <i class="fa-solid fa-plus"></i> Ekle
                 </button>
             </div>
         </div>
@@ -46,6 +90,15 @@
         <!-- İÇERİK ALANI -->
         <div id="main-content" class="flex-1 overflow-y-auto p-5 space-y-4 pb-24">
             
+            <!-- BİLDİRİM UYARI BANNERI -->
+            <div id="notification-banner" class="hidden custom-card p-3 rounded-2xl border border-amber-500/30 bg-amber-950/20 text-xs flex items-center justify-between">
+                <div class="flex items-center gap-2 text-amber-300">
+                    <i class="fa-solid fa-triangle-exclamation text-base"></i>
+                    <span id="notification-banner-text">Bugün ödenmesi gereken ödemeleriniz var!</span>
+                </div>
+                <button onclick="showDetail('today')" class="text-[10px] bg-amber-500 text-slate-950 font-bold px-2 py-1 rounded-lg">Gör</button>
+            </div>
+
             <!-- ÖZET KARTLARI -->
             <div class="grid grid-cols-2 gap-3">
                 <div onclick="showDetail('today')" class="custom-card p-3.5 rounded-2xl cursor-pointer hover:border-emerald-500/50 transition group">
@@ -155,7 +208,39 @@
         </div>
     </div>
 
-    <!-- ÖN İZLEME MODALI (DETAYLI GÖRÜNÜM) -->
+    <!-- GELİŞMİŞ TAKVİM MODALI (GÜN / HAFTA / AY / YIL) -->
+    <div id="calendar-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+        <div class="w-full max-w-md custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2"><i class="fa-solid fa-calendar text-emerald-400"></i> Takvim Görünümü</h3>
+                <button onclick="closeCalendarModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Görünüm Seçim Sekmeleri -->
+            <div class="grid grid-cols-4 gap-1 bg-slate-900 p-1 rounded-xl text-xs font-medium border border-slate-800">
+                <button id="cal-tab-day" onclick="setCalendarView('day')" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">Gün</button>
+                <button id="cal-tab-week" onclick="setCalendarView('week')" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">Hafta</button>
+                <button id="cal-tab-month" onclick="setCalendarView('month')" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">Ay</button>
+                <button id="cal-tab-year" onclick="setCalendarView('year')" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">Yıl</button>
+            </div>
+
+            <!-- Tarih / Ay / Yıl Seçici -->
+            <div id="cal-picker-container">
+                <input type="date" id="calendar-picker" onchange="renderCalendarView()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none">
+            </div>
+
+            <!-- Takvim Görünüm Özet Toplamı -->
+            <div class="flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-800 text-xs">
+                <span class="text-slate-400">Seçili Dönem Toplamı:</span>
+                <span id="cal-view-total" class="font-bold text-emerald-400 text-sm">₺0,00</span>
+            </div>
+
+            <!-- Liste Alanı -->
+            <div id="calendar-day-list" class="max-h-60 overflow-y-auto space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- ÖN İZLEME MODALI -->
     <div id="preview-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
         <div class="w-full max-w-sm custom-card p-6 rounded-3xl border border-slate-700 shadow-2xl space-y-4 relative">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -204,7 +289,7 @@
                 </div>
                 <div>
                     <label class="block text-[11px] text-slate-400 mb-1">Açıklama / Detay</label>
-                    <textarea id="pay-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="İşlem ile ilgili detaylı açıklama..."></textarea>
+                    <textarea id="pay-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Açıklama..."></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -233,23 +318,6 @@
         </div>
     </div>
 
-    <!-- TAKVİM MODALI -->
-    <div id="calendar-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
-        <div class="w-full max-w-md custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2"><i class="fa-solid fa-calendar text-emerald-400"></i> Takvim & Günlük Ödemeler</h3>
-                <button onclick="closeCalendarModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div>
-                <label class="block text-[11px] text-slate-400 mb-1">Tarih Seçin</label>
-                <input type="date" id="calendar-picker" onchange="loadCalendarDay(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none">
-            </div>
-            <div id="calendar-day-list" class="max-h-60 overflow-y-auto space-y-2">
-                <p class="text-center text-xs text-slate-500 py-4">Lütfen bir tarih seçin.</p>
-            </div>
-        </div>
-    </div>
-
     <!-- PDF YÜKLEME MODALI -->
     <div id="upload-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
         <div class="w-full max-w-sm custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
@@ -257,8 +325,8 @@
                 <h3 class="font-bold text-slate-100 text-sm">PDF'den Otomatik İşlem Yükle</h3>
                 <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-xs text-slate-400">PDF dosyanızı seçin. Tarihler, tutarlar ve açıklamalar eksiksiz taranarak tarih sırasına göre eklenecektir.</p>
-            <input type="file" id="pdf-file-input" accept=".pdf" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
+            <p class="text-xs text-slate-400">PDF dosyanızı seçin. Tarihler, tutarlar ve açıklamalar taranıp tarih sırasına göre eklenecektir.</p>
+            <input type="file" id="pdf-file-input" accept=".pdf" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white">
             <button onclick="processUploadedPDF()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition shadow-lg">PDF'i Tara ve İşle</button>
         </div>
     </div>
@@ -298,9 +366,9 @@
     <!-- JAVASCRIPT -->
     <script>
         let payments = JSON.parse(localStorage.getItem('hily_payments')) || [
-            { id: 1, title: 'Dükkan Kirası', description: 'Ekim ayı iş yeri kira ödemesi', amount: 15000, date: '2026-10-27', status: false, category: 'normal' },
-            { id: 2, title: 'Makine Bakımı', description: 'Tekstil makineleri yıllık bakım ücreti', amount: 7500, date: '2026-10-25', status: true, category: 'large' },
-            { id: 3, title: 'Kargo Malzemesi', description: 'Koli ve bant tedariği', amount: 1200, date: '2026-10-26', status: false, category: 'other' }
+            { id: 1, title: 'Dükkan Kirası', description: 'Ekim ayı dükkan kirası', amount: 15000, date: new Date().toISOString().split('T')[0], status: false, category: 'normal' },
+            { id: 2, title: 'Makine Bakımı', description: 'Atölye makineleri bakımı', amount: 7500, date: new Date().toISOString().split('T')[0], status: true, category: 'large' },
+            { id: 3, title: 'Kargo Malzemesi', description: 'Koli bandı ve paket ambalajı', amount: 1200, date: new Date().toISOString().split('T')[0], status: false, category: 'other' }
         ];
 
         let appSettings = JSON.parse(localStorage.getItem('hily_settings')) || {
@@ -310,10 +378,14 @@
             fontFamily: 'sans-serif'
         };
 
+        let currentCalendarView = 'day';
+
         window.onload = function() {
             sortPaymentsByDate();
             updateDashboardCards();
             applySettings();
+            fetchWeather();
+            checkTodayNotifications();
         };
 
         function saveData() {
@@ -323,11 +395,194 @@
             updateDashboardCards();
         }
 
-        // Tarihe göre kronolojik sıralama (Yeniden eskiye veya eskiden yeniye)
         function sortPaymentsByDate() {
             payments.sort((a, b) => new Date(a.date) - new Date(b.date));
         }
 
+        // --- 1. DİNAMİK HAVA DURUMU VE CANLI ARKA PLAN EFEEKTİ ---
+        async function fetchWeather() {
+            const badge = document.getElementById('weather-badge');
+            try {
+                // İstanbul Koordinatları (41.0082, 28.9784)
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&current_weather=true');
+                const data = await res.json();
+                const code = data.current_weather.weathercode;
+                const temp = Math.round(data.current_weather.temperature);
+
+                let status = 'Sunny';
+                let icon = 'fa-sun text-amber-400';
+                let text = `Güneşli ${temp}°C`;
+
+                // Open-Meteo Weather Codes Mapping
+                if (code >= 1 && code <= 3) {
+                    text = `Parçalı Bulutlu ${temp}°C`;
+                    icon = 'fa-cloud-sun text-amber-300';
+                } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+                    status = 'Rainy';
+                    text = `Yağmurlu ${temp}°C`;
+                    icon = 'fa-cloud-showers-heavy text-blue-400';
+                } else if (code >= 71 && code <= 77) {
+                    status = 'Snowy';
+                    text = `Karlı ${temp}°C`;
+                    icon = 'fa-snowflake text-sky-200';
+                }
+
+                badge.innerHTML = `<i class="fa-solid ${icon}"></i> ${text}`;
+
+                // Eğer kullanıcı galeriden özel resim eklemediyse hava durumuna göre tema uygula
+                if (!appSettings.bgImage) {
+                    applyWeatherBackground(status);
+                }
+            } catch (e) {
+                badge.innerHTML = `<i class="fa-solid fa-cloud text-slate-400"></i> İstanbul 20°C`;
+            }
+        }
+
+        function applyWeatherBackground(type) {
+            const body = document.getElementById('app-body');
+            const effectContainer = document.getElementById('weather-effect-container');
+            effectContainer.innerHTML = '';
+            body.className = body.className.replace(/sunny-bg|rainy-bg|snowy-bg/g, '');
+
+            if (type === 'Sunny') {
+                body.classList.add('sunny-bg');
+            } else if (type === 'Rainy') {
+                body.classList.add('rainy-bg');
+                createDrops(40, 'rain-drop', 'weather-rain');
+            } else if (type === 'Snowy') {
+                body.classList.add('snowy-bg');
+                createDrops(30, 'snow-drop', 'weather-snow');
+            }
+        }
+
+        function createDrops(count, dropClass, containerClass) {
+            const container = document.createElement('div');
+            container.className = containerClass;
+            for (let i = 0; i < count; i++) {
+                const drop = document.createElement('div');
+                drop.className = `drop ${dropClass}`;
+                drop.style.left = `${Math.random() * 100}%`;
+                drop.style.animationDuration = `${1 + Math.random() * 2}s`;
+                drop.style.animationDelay = `${Math.random() * 2}s`;
+                container.appendChild(drop);
+            }
+            document.getElementById('weather-effect-container').appendChild(container);
+        }
+
+        // --- 2. BİLDİRİM SİSTEMİ ---
+        function checkTodayNotifications() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayUnpaid = payments.filter(p => p.category === 'normal' && p.date === todayStr && !p.status);
+
+            if (todayUnpaid.length > 0) {
+                const banner = document.getElementById('notification-banner');
+                document.getElementById('notification-banner-text').innerText = `Bugün ödenmesi gereken ${todayUnpaid.length} ödemeniz var!`;
+                banner.classList.remove('hidden');
+
+                if (Notification.permission === 'granted') {
+                    new Notification("Ödeme Takip Hatırlatıcı", {
+                        body: `Bugün vadesi gelen ${todayUnpaid.length} adet ödemeniz bulunmaktadır.`,
+                        icon: "https://cdn-icons-png.flaticon.com/512/2693/2693507.png"
+                    });
+                }
+            }
+        }
+
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        alert("Bildirim izni verildi! Bugün vadesi gelen ödemeleriniz bildirilecektir.");
+                        checkTodayNotifications();
+                    } else {
+                        alert("Bildirim izni reddedildi veya engellendi.");
+                    }
+                });
+            } else {
+                alert("Tarayıcınız bildirim özelliğini desteklemiyor.");
+            }
+        }
+
+        // --- 3. GELİŞMİŞ TAKVİM (GÜN, HAFTA, AY, YIL) ---
+        function setCalendarView(view) {
+            currentCalendarView = view;
+            ['day', 'week', 'month', 'year'].forEach(v => {
+                const btn = document.getElementById(`cal-tab-${v}`);
+                if (v === view) {
+                    btn.className = "py-1.5 rounded-lg bg-emerald-600 text-white font-semibold transition";
+                } else {
+                    btn.className = "py-1.5 rounded-lg text-slate-400 hover:text-white transition";
+                }
+            });
+            renderCalendarView();
+        }
+
+        function renderCalendarView() {
+            const pickerVal = document.getElementById('calendar-picker').value || new Date().toISOString().split('T')[0];
+            const listEl = document.getElementById('calendar-day-list');
+            const totalEl = document.getElementById('cal-view-total');
+            listEl.innerHTML = '';
+
+            const selectedDate = new Date(pickerVal);
+            let filtered = [];
+
+            if (currentCalendarView === 'day') {
+                filtered = payments.filter(p => p.date === pickerVal);
+            } else if (currentCalendarView === 'week') {
+                const day = selectedDate.getDay();
+                const diffToMon = selectedDate.getDate() - day + (day === 0 ? -6 : 1);
+                const mon = new Date(selectedDate.setDate(diffToMon));
+                mon.setHours(0,0,0,0);
+                const sun = new Date(mon);
+                sun.setDate(mon.getDate() + 6);
+                sun.setHours(23,59,59,999);
+
+                filtered = payments.filter(p => {
+                    const d = new Date(p.date);
+                    return d >= mon && d <= sun;
+                });
+            } else if (currentCalendarView === 'month') {
+                const yearMonth = pickerVal.substring(0, 7); // YYYY-MM
+                filtered = payments.filter(p => p.date.startsWith(yearMonth));
+            } else if (currentCalendarView === 'year') {
+                const year = pickerVal.substring(0, 4); // YYYY
+                filtered = payments.filter(p => p.date.startsWith(year));
+            }
+
+            const totalSum = filtered.reduce((acc, curr) => acc + curr.amount, 0);
+            totalEl.innerText = formatCurrency(totalSum);
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<p class="text-center text-xs text-slate-500 py-4">Bu görünümde kayıtlı ödeme bulunamadı.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "custom-card p-3 rounded-xl flex items-center justify-between border border-slate-800 cursor-pointer hover:border-slate-600 transition";
+                itemDiv.onclick = () => openPreview(item.id);
+                itemDiv.innerHTML = `
+                    <div>
+                        <div class="text-xs font-semibold text-slate-200">${item.title}</div>
+                        <div class="text-[10px] text-slate-400 flex items-center gap-2">
+                            <span><i class="fa-regular fa-calendar mr-1"></i>${formatDate(item.date)}</span>
+                            <span class="${item.status ? 'text-emerald-400' : 'text-rose-400'}">${item.status ? 'Ödendi' : 'Ödenmedi'}</span>
+                        </div>
+                    </div>
+                    <span class="text-xs font-bold text-slate-100">${formatCurrency(item.amount)}</span>
+                `;
+                listEl.appendChild(itemDiv);
+            });
+        }
+
+        function openCalendarModal() {
+            document.getElementById('calendar-picker').value = new Date().toISOString().split('T')[0];
+            setCalendarView('day');
+            document.getElementById('calendar-modal').classList.remove('hidden');
+        }
+        function closeCalendarModal() { document.getElementById('calendar-modal').classList.add('hidden'); }
+
+        // --- DİĞER STANDART FONKSİYONLAR ---
         function applySettings() {
             const body = document.getElementById('app-body');
             body.style.backgroundColor = appSettings.bgColor;
@@ -358,23 +613,13 @@
             }
         }
 
-        function changeTextColor(val) {
-            appSettings.textColor = val;
-            saveData();
-            applySettings();
-        }
-
-        function changeFontFamily(val) {
-            appSettings.fontFamily = val;
-            saveData();
-            applySettings();
-        }
+        function changeTextColor(val) { appSettings.textColor = val; saveData(); applySettings(); }
+        function changeFontFamily(val) { appSettings.fontFamily = val; saveData(); applySettings(); }
 
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const parts = dateStr.split('-');
-            if (parts.length !== 3) return dateStr;
-            return `${parts[2]}.${parts[1]}.${parts[0]}`;
+            return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateStr;
         }
 
         function formatCurrency(amount) {
@@ -431,7 +676,6 @@
             let filtered = [];
             let titleText = '';
             const todayStr = new Date().toISOString().split('T')[0];
-            const currentMonth = new Date().toISOString().slice(0, 7);
             const { monday, sunday } = getThisWeekRange();
 
             if (type === 'today') {
@@ -500,7 +744,6 @@
             });
         }
 
-        // ÖN İZLEME MODALINI AÇ
         function openPreview(id) {
             const item = payments.find(p => p.id === id);
             if (!item) return;
@@ -517,10 +760,7 @@
             document.getElementById('preview-modal').classList.remove('hidden');
         }
 
-        function closePreviewModal() {
-            document.getElementById('preview-modal').classList.add('hidden');
-        }
-
+        function closePreviewModal() { document.getElementById('preview-modal').classList.add('hidden'); }
         function closeModal() { document.getElementById('detail-modal').classList.add('hidden'); updateDashboardCards(); }
         
         function openAddModal(defaultCategory = 'normal') {
@@ -543,10 +783,7 @@
             });
             saveData();
             closeAddModal();
-            const activeModalTitle = document.getElementById('modal-title').innerText;
-            if (activeModalTitle.includes('Büyük')) showDetail('large');
-            else if (activeModalTitle.includes('Diğer')) showDetail('other');
-            else showDetail('all');
+            showDetail('all');
         }
 
         function toggleStatus(e, id) {
@@ -555,15 +792,7 @@
             if (item) {
                 item.status = !item.status;
                 saveData();
-                const activeModalTitle = document.getElementById('modal-title').innerText;
-                if (activeModalTitle.includes('Bugün')) showDetail('today');
-                else if (activeModalTitle.includes('Gecikmiş')) showDetail('overdue');
-                else if (activeModalTitle.includes('Yaklaşan')) showDetail('upcoming');
-                else if (activeModalTitle.includes('Tüm')) showDetail('all');
-                else if (activeModalTitle.includes('Ödenen')) showDetail('paid');
-                else if (activeModalTitle.includes('Ödenmeyen')) showDetail('unpaid');
-                else if (activeModalTitle.includes('Büyük')) showDetail('large');
-                else if (activeModalTitle.includes('Diğer')) showDetail('other');
+                closeModal();
             }
         }
 
@@ -576,40 +805,9 @@
             }
         }
 
-        function openCalendarModal() {
-            document.getElementById('calendar-picker').value = new Date().toISOString().split('T')[0];
-            loadCalendarDay(document.getElementById('calendar-picker').value);
-            document.getElementById('calendar-modal').classList.remove('hidden');
-        }
-        function closeCalendarModal() { document.getElementById('calendar-modal').classList.add('hidden'); }
-
-        function loadCalendarDay(dateStr) {
-            const listEl = document.getElementById('calendar-day-list');
-            listEl.innerHTML = '';
-            const dayPayments = payments.filter(p => p.date === dateStr);
-            if (dayPayments.length === 0) {
-                listEl.innerHTML = `<p class="text-center text-xs text-slate-500 py-4">Bu tarihte kayıtlı ödeme yok.</p>`;
-                return;
-            }
-            dayPayments.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = "custom-card p-3 rounded-xl flex items-center justify-between border border-slate-800 cursor-pointer";
-                itemDiv.onclick = () => openPreview(item.id);
-                itemDiv.innerHTML = `
-                    <div>
-                        <div class="text-xs font-semibold text-slate-200">${item.title}</div>
-                        <div class="text-[10px] text-slate-400">${item.description || ''}</div>
-                    </div>
-                    <span class="text-xs font-bold text-slate-100">${formatCurrency(item.amount)}</span>
-                `;
-                listEl.appendChild(itemDiv);
-            });
-        }
-
         function openUploadModal() { document.getElementById('upload-modal').classList.remove('hidden'); }
         function closeUploadModal() { document.getElementById('upload-modal').classList.add('hidden'); }
 
-        // MÜKEMMEL PDF TARAYICI VE AÇIKLAMA AYIRICI
         async function processUploadedPDF() {
             const fileInput = document.getElementById('pdf-file-input');
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -673,10 +871,10 @@
                         payments.push(...extractedItems);
                         saveData();
                         closeUploadModal();
-                        alert(`${extractedItems.length} adet işlem PDF'den başarıyla tarandı ve tarihlerine göre eklendi!`);
+                        alert(`${extractedItems.length} adet işlem PDF'den başarıyla tarandı ve eklendi!`);
                         showDetail('all');
                     } else {
-                        alert('PDF içerisinde uygun formatta tarih ve tutar eşleşmesi bulunamadı.');
+                        alert('PDF içerisinde uygun formatta tarih ve tutar bulunamadı.');
                     }
 
                 } catch (err) {
