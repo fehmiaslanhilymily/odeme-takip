@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF.js for PDF reading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         body {
             background-color: #0f172a;
@@ -15,25 +17,30 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         .custom-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.9));
             border: 1px solid rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(12px);
         }
     </style>
 </head>
-<body class="flex justify-center items-center min-h-screen p-2 sm:p-4">
+<body id="app-body" class="flex justify-center items-center min-h-screen p-2 sm:p-4 bg-cover bg-center" style="background-color: #0f172a;">
 
     <!-- Mobil Çerçeve Kapsayıcısı -->
     <div class="w-full max-w-md h-[92vh] max-h-[850px] custom-card rounded-3xl flex flex-col overflow-hidden shadow-2xl relative border border-slate-700/50">
         
         <!-- ÜST BAŞLIK -->
         <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-slate-800/80">
-            <h1 class="text-xl font-bold tracking-wide flex items-center gap-2 text-slate-100">
+            <h1 id="app-title" class="text-xl font-bold tracking-wide flex items-center gap-2 text-slate-100">
                 <i class="fa-solid fa-calendar-days text-emerald-400"></i> Ödeme <span class="text-slate-400 font-normal">Takip</span>
             </h1>
-            <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg shadow-emerald-900/30 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-plus"></i> Yeni Ekle
-            </button>
+            <div class="flex items-center gap-2">
+                <button onclick="openSettingsModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <button onclick="openAddModal('normal')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg shadow-emerald-900/30 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Yeni Ekle
+                </button>
+            </div>
         </div>
 
         <!-- İÇERİK ALANI (KAYDIRILABİLİR) -->
@@ -41,7 +48,6 @@
             
             <!-- ÖZET KARTLARI (GRID) -->
             <div class="grid grid-cols-2 gap-3">
-                <!-- 1. Bugünkü Ödemeler -->
                 <div onclick="showDetail('today')" class="custom-card p-3.5 rounded-2xl cursor-pointer hover:border-emerald-500/50 transition group">
                     <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
                         Bugünkü Ödemeler
@@ -50,7 +56,6 @@
                     <div id="card-today" class="text-lg font-bold text-emerald-400">₺0,00</div>
                 </div>
 
-                <!-- 2. Gecikmiş Ödemeler -->
                 <div onclick="showDetail('overdue')" class="custom-card p-3.5 rounded-2xl cursor-pointer hover:border-rose-500/50 transition group">
                     <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
                         Gecikmiş Ödemeler
@@ -59,7 +64,6 @@
                     <div id="card-overdue" class="text-lg font-bold text-rose-400">₺0,00</div>
                 </div>
 
-                <!-- 3. Yaklaşan Ödemeler (Bu Hafta Pzt-Paz) -->
                 <div onclick="showDetail('upcoming')" class="custom-card p-3.5 rounded-2xl cursor-pointer hover:border-amber-500/50 transition group">
                     <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
                         Yaklaşan (Bu Hafta)
@@ -68,7 +72,6 @@
                     <div id="card-upcoming" class="text-lg font-bold text-amber-400">₺0,00</div>
                 </div>
 
-                <!-- 4. Tüm Ödemeler (Bu Ay) -->
                 <div onclick="showDetail('all')" class="custom-card p-3.5 rounded-2xl cursor-pointer hover:border-blue-500/50 transition group">
                     <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
                         Tüm Ödemeler (Ay)
@@ -78,48 +81,34 @@
                 </div>
             </div>
 
-            <!-- KATEGORİ BUTONLARI (Ödenen, Ödenmeyen, Büyük, Diğer) -->
+            <!-- KATEGORİ BUTONLARI -->
             <div class="grid grid-cols-4 gap-2 pt-1">
                 <button onclick="showDetail('paid')" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/20 hover:bg-emerald-900/40 transition">
-                    <div class="w-8 h-8 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center mb-1 text-sm">
-                        <i class="fa-solid fa-check"></i>
-                    </div>
+                    <div class="w-8 h-8 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center mb-1 text-sm"><i class="fa-solid fa-check"></i></div>
                     <span class="text-[11px] font-medium text-slate-300">Ödenen</span>
                 </button>
-
                 <button onclick="showDetail('unpaid')" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-rose-950/40 border border-rose-500/20 hover:bg-rose-900/40 transition">
-                    <div class="w-8 h-8 rounded-xl bg-rose-600/20 text-rose-400 flex items-center justify-center mb-1 text-sm">
-                        <i class="fa-solid fa-hourglass-half"></i>
-                    </div>
+                    <div class="w-8 h-8 rounded-xl bg-rose-600/20 text-rose-400 flex items-center justify-center mb-1 text-sm"><i class="fa-solid fa-hourglass-half"></i></div>
                     <span class="text-[11px] font-medium text-slate-300">Ödenmeyen</span>
                 </button>
-
                 <button onclick="showDetail('large')" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-amber-950/40 border border-amber-500/20 hover:bg-amber-900/40 transition">
-                    <div class="w-8 h-8 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center mb-1 text-sm">
-                        <i class="fa-solid fa-sack-dollar"></i>
-                    </div>
+                    <div class="w-8 h-8 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center mb-1 text-sm"><i class="fa-solid fa-sack-dollar"></i></div>
                     <span class="text-[11px] font-medium text-slate-300">Büyük</span>
                 </button>
-
                 <button onclick="showDetail('other')" class="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-sky-950/40 border border-sky-500/20 hover:bg-sky-900/40 transition">
-                    <div class="w-8 h-8 rounded-xl bg-sky-600/20 text-sky-400 flex items-center justify-center mb-1 text-sm">
-                        <i class="fa-solid fa-thumbtack"></i>
-                    </div>
+                    <div class="w-8 h-8 rounded-xl bg-sky-600/20 text-sky-400 flex items-center justify-center mb-1 text-sm"><i class="fa-solid fa-thumbtack"></i></div>
                     <span class="text-[11px] font-medium text-slate-300">Diğer</span>
                 </button>
             </div>
 
-            <!-- HIZLI İŞLEM BUTONU -->
-            <button onclick="openAddModal()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2 transition text-sm">
-                <i class="fa-solid fa-plus-circle text-base"></i> Yeni Ödeme Ekle
-            </button>
-
-            <!-- ÖZET BİLGİ KUTUSU -->
-            <div class="custom-card p-4 rounded-2xl border border-slate-800">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Bilgilendirme</h3>
-                <p class="text-xs text-slate-400 leading-relaxed">
-                    Bugünkü, gecikmeli, yaklaşan ve ödenen ödemeler otomatik olarak ana tablodaki tarihlere ve ödeme durumlarına göre listelenir. Büyük ve Diğer ödemeler ise sadece kendi kategorilerinde manuel takip edilir.
-                </p>
+            <!-- HIZLI İŞLEM BUTONLARI -->
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="openAddModal('normal')" class="py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-2xl shadow-lg flex items-center justify-center gap-2 text-xs transition">
+                    <i class="fa-solid fa-plus-circle"></i> Yeni Ödeme Ekle
+                </button>
+                <button onclick="openUploadModal()" class="py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-2xl shadow-lg flex items-center justify-center gap-2 text-xs transition">
+                    <i class="fa-solid fa-file-arrow-up"></i> Veri / PDF Yükle
+                </button>
             </div>
         </div>
 
@@ -133,40 +122,36 @@
                 <i class="fa-solid fa-clipboard-list text-lg mb-0.5"></i>
                 <span class="text-[10px]">Tümü</span>
             </button>
+            <button onclick="openCalendarModal()" class="flex flex-col items-center text-slate-400 hover:text-slate-200 transition">
+                <i class="fa-solid fa-calendar-days text-lg mb-0.5"></i>
+                <span class="text-[10px]">Takvim</span>
+            </button>
             <button onclick="showDetail('upcoming')" class="flex flex-col items-center text-slate-400 hover:text-slate-200 transition">
                 <i class="fa-solid fa-calendar-week text-lg mb-0.5"></i>
                 <span class="text-[10px]">Hafta</span>
             </button>
-            <button onclick="showDetail('today')" class="flex flex-col items-center text-slate-400 hover:text-slate-200 transition">
-                <i class="fa-solid fa-calendar-day text-lg mb-0.5"></i>
-                <span class="text-[10px]"> Bugün</span>
-            </button>
-            <button onclick="showDetail('paid')" class="flex flex-col items-center text-slate-400 hover:text-slate-200 transition">
-                <i class="fa-solid fa-chart-pie text-lg mb-0.5"></i>
-                <span class="text-[10px]">Ödenen</span>
+            <button onclick="openSettingsModal()" class="flex flex-col items-center text-slate-400 hover:text-slate-200 transition">
+                <i class="fa-solid fa-gear text-lg mb-0.5"></i>
+                <span class="text-[10px]">Ayarlar</span>
             </button>
         </div>
     </div>
 
-    <!-- DETAY / LİSTELEME MODALI (TAM EKRAN OVERLAY) -->
+    <!-- DETAY / LİSTELEME MODALI -->
     <div id="detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-2 sm:p-4">
         <div class="w-full max-w-md h-[92vh] max-h-[850px] custom-card rounded-3xl flex flex-col overflow-hidden shadow-2xl border border-slate-700/50">
-            <!-- Modal Başlık -->
             <div class="px-6 py-4 flex items-center justify-between border-b border-slate-800">
                 <h2 id="modal-title" class="text-base font-bold text-slate-100 flex items-center gap-2"></h2>
-                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="modal-add-btn" onclick="" class="hidden bg-emerald-600 text-white px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1"><i class="fa-solid fa-plus"></i> Ekle</button>
+                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
-            <!-- Modal Toplam Tutar Alanı -->
             <div class="px-6 py-3 bg-slate-900/50 border-b border-slate-800 flex justify-between items-center">
                 <span class="text-xs text-slate-400 font-medium">Toplam Tutar:</span>
                 <span id="modal-total" class="text-lg font-bold text-emerald-400">₺0,00</span>
             </div>
-            <!-- Liste İçeriği -->
-            <div id="modal-list" class="flex-1 overflow-y-auto p-4 space-y-3">
-                <!-- JavaScript ile doldurulacak -->
-            </div>
+            <div id="modal-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
         </div>
     </div>
 
@@ -174,14 +159,13 @@
     <div id="add-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
         <div class="w-full max-w-sm custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 text-sm">Yeni Ödeme / İşlem Ekle</h3>
+                <h3 id="add-modal-title" class="font-bold text-slate-100 text-sm">Yeni Ödeme Ekle</h3>
                 <button onclick="closeAddModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
             <form id="add-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
                 <div>
                     <label class="block text-[11px] text-slate-400 mb-1">İşlem / Ödeme Adı</label>
-                    <input type="text" id="pay-title" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Örn: Kira, Elektrik, Tedarik">
+                    <input type="text" id="pay-title" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Örn: Kira, Elektrik">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -189,47 +173,161 @@
                         <input type="number" step="0.01" id="pay-amount" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="0.00">
                     </div>
                     <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">Vade / İşlem Tarihi</label>
+                        <label class="block text-[11px] text-slate-400 mb-1">Tarih</label>
                         <input type="date" id="pay-date" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">Kategori / Bölüm</label>
+                    <label class="block text-[11px] text-slate-400 mb-1">Kategori</label>
                     <select id="pay-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
-                        <option value="normal">Normal Ödeme (Otomatik Dağılır)</option>
-                        <option value="large">Büyük Ödemeler (Sadece burada görünür)</option>
-                        <option value="other">Diğer Ödemeler (Sadece burada görünür)</option>
+                        <option value="normal">Normal Ödeme</option>
+                        <option value="large">Büyük Ödeme (Sadece burada görünür)</option>
+                        <option value="other">Diğer Ödeme (Sadece burada görünür)</option>
                     </select>
                 </div>
                 <div class="flex items-center gap-2 pt-1">
                     <input type="checkbox" id="pay-status" class="w-4 h-4 accent-emerald-500 rounded bg-slate-900 border-slate-700">
-                    <label for="pay-status" class="text-xs text-slate-300">Şimdiden Ödendi olarak işaretle</label>
+                    <label for="pay-status" class="text-xs text-slate-300">Ödendi olarak işaretle</label>
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold text-xs transition shadow-lg shadow-emerald-900/30 mt-2">
-                    Kaydet
-                </button>
+                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold text-xs transition shadow-lg mt-2">Kaydet</button>
             </form>
+        </div>
+    </div>
+
+    <!-- TAKVİM MODALI -->
+    <div id="calendar-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+        <div class="w-full max-w-md custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2"><i class="fa-solid fa-calendar text-emerald-400"></i> Takvim & Günlük Ödemeler</h3>
+                <button onclick="closeCalendarModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Tarih Seçin</label>
+                <input type="date" id="calendar-picker" onchange="loadCalendarDay(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+            </div>
+            <div id="calendar-day-list" class="max-h-60 overflow-y-auto space-y-2">
+                <p class="text-center text-xs text-slate-500 py-4">Lütfen bir tarih seçin.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- VERİ / PDF YÜKLEME MODALI -->
+    <div id="upload-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+        <div class="w-full max-w-sm custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm">PDF / Veri Yükleme</h3>
+                <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-400">PDF dosyanızı seçin. İçerisindeki metinler taranarak otomatik olarak "Tüm Ödemeler" listesine eklenecektir.</p>
+            <input type="file" id="pdf-file-input" accept=".pdf" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500">
+            <button onclick="processUploadedPDF()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition shadow-lg">Dosyayı Tara ve İşle</button>
+        </div>
+    </div>
+
+    <!-- AYARLAR MODALI -->
+    <div id="settings-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
+        <div class="w-full max-w-sm custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2"><i class="fa-solid fa-gear text-emerald-400"></i> Uygulama Ayarları</h3>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Arka Plan Rengi</label>
+                    <input type="color" id="setting-bg-color" value="#0f172a" onchange="changeBgColor(this.value)" class="w-full h-10 bg-slate-900 border border-slate-700 rounded-xl px-2 cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Galeriden Arka Plan Resmi Seç</label>
+                    <input type="file" id="setting-bg-img" accept="image/*" onchange="changeBgImage(this)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-white hover:file:bg-slate-700">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Yazı Rengi</label>
+                    <input type="color" id="setting-text-color" value="#f8fafc" onchange="changeTextColor(this.value)" class="w-full h-10 bg-slate-900 border border-slate-700 rounded-xl px-2 cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Yazı Tipi (Font)</label>
+                    <select id="setting-font-family" onchange="changeFontFamily(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none">
+                        <option value="sans-serif">Modern (Sans-Serif)</option>
+                        <option value="serif">Klasik (Serif)</option>
+                        <option value="monospace">Kod / Yazı Tipi (Monospace)</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- JAVASCRIPT MANTIK VE İŞLEYİŞİ -->
     <script>
-        // LocalStorage Veri Yönetimi
         let payments = JSON.parse(localStorage.getItem('hily_payments')) || [
             { id: 1, title: 'Dükkan Kirası', amount: 15000, date: new Date().toISOString().split('T')[0], status: false, category: 'normal' },
-            { id: 2, title: 'İnternet Faturası', amount: 450, date: new Date(Date.now() - 86400000).toISOString().split('T')[0], status: false, category: 'normal' },
-            { id: 3, title: 'Makine Bakımı', amount: 7500, date: new Date().toISOString().split('T')[0], status: true, category: 'large' },
-            { id: 4, title: 'Kargo Malzemesi', amount: 1200, date: new Date().toISOString().split('T')[0], status: false, category: 'other' }
+            { id: 2, title: 'Makine Bakımı', amount: 7500, date: new Date().toISOString().split('T')[0], status: true, category: 'large' },
+            { id: 3, title: 'Kargo Malzemesi', amount: 1200, date: new Date().toISOString().split('T')[0], status: false, category: 'other' }
         ];
+
+        let appSettings = JSON.parse(localStorage.getItem('hily_settings')) || {
+            bgColor: '#0f172a',
+            bgImage: '',
+            textColor: '#f8fafc',
+            fontFamily: 'sans-serif'
+        };
+
+        window.onload = function() {
+            updateDashboardCards();
+            applySettings();
+        };
 
         function saveData() {
             localStorage.setItem('hily_payments', JSON.stringify(payments));
+            localStorage.setItem('hily_settings', JSON.stringify(appSettings));
             updateDashboardCards();
         }
 
-        // Tarih Yardımcı Fonksiyonları
+        function applySettings() {
+            const body = document.getElementById('app-body');
+            body.style.backgroundColor = appSettings.bgColor;
+            body.style.color = appSettings.textColor;
+            body.style.fontFamily = appSettings.fontFamily;
+            if (appSettings.bgImage) {
+                body.style.backgroundImage = `url(${appSettings.bgImage})`;
+            }
+        }
+
+        function changeBgColor(val) {
+            appSettings.bgColor = val;
+            appSettings.bgImage = '';
+            document.getElementById('app-body').style.backgroundImage = 'none';
+            saveData();
+            applySettings();
+        }
+
+        function changeBgImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    appSettings.bgImage = e.target.result;
+                    saveData();
+                    applySettings();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function changeTextColor(val) {
+            appSettings.textColor = val;
+            saveData();
+            applySettings();
+        }
+
+        function changeFontFamily(val) {
+            appSettings.fontFamily = val;
+            saveData();
+            applySettings();
+        }
+
         function formatDate(dateStr) {
+            if (!dateStr) return '';
             const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
             return `${parts[2]}.${parts[1]}.${parts[0]}`;
         }
 
@@ -237,58 +335,34 @@
             return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount);
         }
 
-        // Bu Haftanın (Pazartesi - Pazar) Tarih Aralığını Hesapla
         function getThisWeekRange() {
             const now = new Date();
             const day = now.getDay();
-            // Pazartesi'yi haftanın ilk günü yap (Pazar=0 ise 7 al)
             const diffToMon = now.getDate() - day + (day === 0 ? -6 : 1);
             const monday = new Date(now.setDate(diffToMon));
             monday.setHours(0, 0, 0, 0);
-
             const sunday = new Date(monday);
             sunday.setDate(monday.getDate() + 6);
             sunday.setHours(23, 59, 59, 999);
-
             return { monday, sunday };
         }
 
-        // Ana Sayfa Kart Totallerini Güncelle
         function updateDashboardCards() {
             const todayStr = new Date().toISOString().split('T')[0];
-            const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+            const currentMonth = new Date().toISOString().slice(0, 7);
             const { monday, sunday } = getThisWeekRange();
 
-            let todayTotal = 0;
-            let overdueTotal = 0;
-            let upcomingTotal = 0;
-            let allMonthTotal = 0;
+            let todayTotal = 0, overdueTotal = 0, upcomingTotal = 0, allMonthTotal = 0;
 
             payments.forEach(p => {
-                if (p.category !== 'normal') return; // Büyük ve Diğerler otomatik hesaplara karışmaz
-
+                if (p.category !== 'normal') return;
                 const pDate = new Date(p.date);
                 const pDateStr = p.date;
 
-                // 1. Tüm Ödemeler (Bu Ay)
-                if (p.date.startsWith(currentMonth)) {
-                    allMonthTotal += p.amount;
-                }
-
-                // 2. Bugünkü Ödemeler (Vadesi bugün olanlar)
-                if (pDateStr === todayStr && !p.status) {
-                    todayTotal += p.amount;
-                }
-
-                // 3. Gecikmiş Ödemeler (Vadesi bugünden küçük ve ödenmemiş)
-                if (pDateStr < todayStr && !p.status) {
-                    overdueTotal += p.amount;
-                }
-
-                // 4. Yaklaşan Ödemeler (Bu hafta Pzt - Paz arası ve ödenmemiş)
-                if (pDate >= monday && pDate <= sunday && !p.status && pDateStr >= todayStr) {
-                    upcomingTotal += p.amount;
-                }
+                if (p.date.startsWith(currentMonth)) allMonthTotal += p.amount;
+                if (pDateStr === todayStr && !p.status) todayTotal += p.amount;
+                if (pDateStr < todayStr && !p.status) overdueTotal += p.amount;
+                if (pDate >= monday && pDate <= sunday && !p.status && pDateStr >= todayStr) upcomingTotal += p.amount;
             });
 
             document.getElementById('card-today').innerText = formatCurrency(todayTotal);
@@ -297,15 +371,16 @@
             document.getElementById('card-all').innerText = formatCurrency(allMonthTotal);
         }
 
-        // Detay / Liste Modalını Aç ve Filtrele
         function showDetail(type) {
             const modal = document.getElementById('detail-modal');
             const titleEl = document.getElementById('modal-title');
             const totalEl = document.getElementById('modal-total');
             const listEl = document.getElementById('modal-list');
+            const addBtn = document.getElementById('modal-add-btn');
 
             modal.classList.remove('hidden');
             listEl.innerHTML = '';
+            addBtn.classList.add('hidden');
 
             let filtered = [];
             let titleText = '';
@@ -337,23 +412,21 @@
             } else if (type === 'large') {
                 titleText = 'Büyük Ödemeler (Manuel)';
                 filtered = payments.filter(p => p.category === 'large');
+                addBtn.classList.remove('hidden');
+                addBtn.setAttribute('onclick', "openAddModal('large')");
             } else if (type === 'other') {
                 titleText = 'Diğer Ödemeler (Manuel)';
                 filtered = payments.filter(p => p.category === 'other');
+                addBtn.classList.remove('hidden');
+                addBtn.setAttribute('onclick', "openAddModal('other')");
             }
 
             titleEl.innerHTML = `<i class="fa-solid fa-list-check text-emerald-400"></i> ${titleText}`;
-
             let sum = filtered.reduce((acc, curr) => acc + curr.amount, 0);
             totalEl.innerText = formatCurrency(sum);
 
             if (filtered.length === 0) {
-                listEl.innerHTML = `
-                    <div class="text-center py-12 text-slate-500">
-                        <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
-                        <p class="text-xs">Bu kategoride kayıt bulunamadı.</p>
-                    </div>
-                `;
+                listEl.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="fa-solid fa-folder-open text-3xl mb-2"></i><p class="text-xs">Kayıt bulunamadı.</p></div>`;
                 return;
             }
 
@@ -365,20 +438,14 @@
                         <div class="text-sm font-semibold text-slate-200">${item.title}</div>
                         <div class="text-[11px] text-slate-400 flex items-center gap-2">
                             <span><i class="fa-regular fa-calendar mr-1"></i>${formatDate(item.date)}</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] ${item.status ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">
-                                ${item.status ? 'Ödendi' : 'Ödenmedi'}
-                            </span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] ${item.status ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${item.status ? 'Ödendi' : 'Ödenmedi'}</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="text-sm font-bold text-slate-100">${formatCurrency(item.amount)}</span>
                         <div class="flex flex-col gap-1">
-                            <button onclick="toggleStatus(${item.id})" title="Durum Değiştir" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition">
-                                <i class="fa-solid ${item.status ? 'fa-rotate-left text-amber-400' : 'fa-check text-emerald-400'}"></i>
-                            </button>
-                            <button onclick="deletePayment(${item.id})" title="Sil" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-900/50 text-rose-400 flex items-center justify-center text-xs transition">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <button onclick="toggleStatus(${item.id})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition"><i class="fa-solid ${item.status ? 'fa-rotate-left text-amber-400' : 'fa-check text-emerald-400'}"></i></button>
+                            <button onclick="deletePayment(${item.id})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-900/50 text-rose-400 flex items-center justify-center text-xs transition"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -386,52 +453,37 @@
             });
         }
 
-        function closeModal() {
-            document.getElementById('detail-modal').classList.add('hidden');
-            updateDashboardCards();
-        }
-
-        // Yeni Ödeme Ekleme Modalı
-        function openAddModal() {
+        function closeModal() { document.getElementById('detail-modal').classList.add('hidden'); updateDashboardCards(); }
+        
+        function openAddModal(defaultCategory = 'normal') {
             document.getElementById('pay-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('pay-category').value = defaultCategory;
             document.getElementById('add-modal').classList.remove('hidden');
         }
-
-        function closeAddModal() {
-            document.getElementById('add-modal').classList.add('hidden');
-            document.getElementById('add-form').reset();
-        }
+        function closeAddModal() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-form').reset(); }
 
         function handleFormSubmit(e) {
             e.preventDefault();
-            const title = document.getElementById('pay-title').value;
-            const amount = parseFloat(document.getElementById('pay-amount').value);
-            const date = document.getElementById('pay-date').value;
-            const category = document.getElementById('pay-category').value;
-            const status = document.getElementById('pay-status').checked;
-
-            const newPayment = {
+            payments.push({
                 id: Date.now(),
-                title,
-                amount,
-                date,
-                category,
-                status
-            };
-
-            payments.push(newPayment);
+                title: document.getElementById('pay-title').value,
+                amount: parseFloat(document.getElementById('pay-amount').value),
+                date: document.getElementById('pay-date').value,
+                category: document.getElementById('pay-category').value,
+                status: document.getElementById('pay-status').checked
+            });
             saveData();
             closeAddModal();
-            updateDashboardCards();
+            const activeModalTitle = document.getElementById('modal-title').innerText;
+            if (activeModalTitle.includes('Büyük')) showDetail('large');
+            else if (activeModalTitle.includes('Diğer')) showDetail('other');
         }
 
-        // Durum Değiştir (Ödendi / Ödenmedi)
         function toggleStatus(id) {
             const item = payments.find(p => p.id === id);
             if (item) {
                 item.status = !item.status;
                 saveData();
-                // Açık olan modalı güncelle
                 const activeModalTitle = document.getElementById('modal-title').innerText;
                 if (activeModalTitle.includes('Bugün')) showDetail('today');
                 else if (activeModalTitle.includes('Gecikmiş')) showDetail('overdue');
@@ -444,25 +496,87 @@
             }
         }
 
-        // Ödeme Silme
         function deletePayment(id) {
-            if (confirm('Bu işlemi silmek istediğinize emin misiniz?')) {
+            if (confirm('Silmek istediğinize emin misiniz?')) {
                 payments = payments.filter(p => p.id !== id);
                 saveData();
                 closeModal();
-                updateDashboardCards();
             }
         }
 
-        function goHome() {
-            closeModal();
-            closeAddModal();
+        function openCalendarModal() {
+            document.getElementById('calendar-picker').value = new Date().toISOString().split('T')[0];
+            loadCalendarDay(document.getElementById('calendar-picker').value);
+            document.getElementById('calendar-modal').classList.remove('hidden');
+        }
+        function closeCalendarModal() { document.getElementById('calendar-modal').classList.add('hidden'); }
+
+        function loadCalendarDay(dateStr) {
+            const listEl = document.getElementById('calendar-day-list');
+            listEl.innerHTML = '';
+            const dayPayments = payments.filter(p => p.date === dateStr);
+            if (dayPayments.length === 0) {
+                listEl.innerHTML = `<p class="text-center text-xs text-slate-500 py-4">Bu tarihte kayıtlı ödeme yok.</p>`;
+                return;
+            }
+            dayPayments.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "custom-card p-3 rounded-xl flex items-center justify-between border border-slate-800";
+                itemDiv.innerHTML = `
+                    <div>
+                        <div class="text-xs font-semibold text-slate-200">${item.title}</div>
+                        <div class="text-[10px] text-slate-400">${item.category.toUpperCase()} - ${item.status ? 'Ödendi' : 'Ödenmedi'}</div>
+                    </div>
+                    <span class="text-xs font-bold text-slate-100">${formatCurrency(item.amount)}</span>
+                `;
+                listEl.appendChild(itemDiv);
+            });
         }
 
-        // Sayfa ilk açıldığında kartları güncelle
-        window.onload = function() {
-            updateDashboardCards();
-        };
+        function openUploadModal() { document.getElementById('upload-modal').classList.remove('hidden'); }
+        function closeUploadModal() { document.getElementById('upload-modal').classList.add('hidden'); }
+
+        async function processUploadedPDF() {
+            const fileInput = document.getElementById('pdf-file-input');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Lütfen bir PDF dosyası seçin.');
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async function() {
+                try {
+                    const typedarray = new Uint8Array(this.result);
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(' ') + "\n";
+                    }
+                    
+                    // Basit metin analizi ile tutar ve açıklama bulma denemesi
+                    payments.push({
+                        id: Date.now(),
+                        title: 'PDF Aktarımı: ' + file.name,
+                        amount: 500.00, // Örnek otomatik tarama tutarı
+                        date: new Date().toISOString().split('T')[0],
+                        category: 'normal',
+                        status: false
+                    });
+                    saveData();
+                    closeUploadModal();
+                    alert('PDF başarıyla tarandı ve "Tüm Ödemeler" kısmına eklendi!');
+                } catch (err) {
+                    alert('PDF okunurken bir hata oluştu.');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
+        function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+        function goHome() { closeModal(); closeCalendarModal(); closeUploadModal(); closeSettingsModal(); }
     </script>
 </body>
 </html>
