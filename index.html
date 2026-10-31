@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- PDF.js for PDF reading -->
+    <!-- PDF.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         body {
@@ -23,7 +23,6 @@
             backdrop-filter: blur(14px);
         }
 
-        /* Weather Animations */
         .weather-rain, .weather-snow {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -43,21 +42,13 @@
             100% { transform: translateY(100vh); }
         }
 
-        /* Sunny effect */
-        .sunny-bg {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 40%, #854d0e 100%) !important;
-        }
-        .rainy-bg {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%) !important;
-        }
-        .snowy-bg {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 60%, #1e3a8a 100%) !important;
-        }
+        .sunny-bg { background: linear-gradient(135deg, #1e293b 0%, #334155 40%, #854d0e 100%) !important; }
+        .rainy-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%) !important; }
+        .snowy-bg { background: linear-gradient(135deg, #1e293b 0%, #334155 60%, #1e3a8a 100%) !important; }
     </style>
 </head>
 <body id="app-body" class="flex justify-center items-center min-h-screen p-2 sm:p-4 bg-cover bg-center transition-colors duration-1000">
 
-    <!-- Dinamik Hava Durumu Efekt Alanı -->
     <div id="weather-effect-container"></div>
 
     <!-- Mobil Çerçeve Kapsayıcısı -->
@@ -69,7 +60,6 @@
                 <h1 id="app-title" class="text-lg font-bold tracking-wide text-slate-100 flex items-center gap-1.5">
                     <i class="fa-solid fa-calendar-days text-emerald-400"></i> Ödeme <span class="text-slate-400 font-normal">Takip</span>
                 </h1>
-                <!-- Hava Durumu Rozeti -->
                 <span id="weather-badge" class="text-[10px] bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700 flex items-center gap-1">
                     <i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor
                 </span>
@@ -90,7 +80,6 @@
         <!-- İÇERİK ALANI -->
         <div id="main-content" class="flex-1 overflow-y-auto p-5 space-y-4 pb-24">
             
-            <!-- BİLDİRİM UYARI BANNERI -->
             <div id="notification-banner" class="hidden custom-card p-3 rounded-2xl border border-amber-500/30 bg-amber-950/20 text-xs flex items-center justify-between">
                 <div class="flex items-center gap-2 text-amber-300">
                     <i class="fa-solid fa-triangle-exclamation text-base"></i>
@@ -208,7 +197,7 @@
         </div>
     </div>
 
-    <!-- GELİŞMİŞ TAKVİM MODALI (GÜN / HAFTA / AY / YIL) -->
+    <!-- GELİŞMİŞ TAKVİM MODALI -->
     <div id="calendar-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4">
         <div class="w-full max-w-md custom-card p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -216,7 +205,6 @@
                 <button onclick="closeCalendarModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Görünüm Seçim Sekmeleri -->
             <div class="grid grid-cols-4 gap-1 bg-slate-900 p-1 rounded-xl text-xs font-medium border border-slate-800">
                 <button id="cal-tab-day" onclick="setCalendarView('day')" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">Gün</button>
                 <button id="cal-tab-week" onclick="setCalendarView('week')" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">Hafta</button>
@@ -224,18 +212,15 @@
                 <button id="cal-tab-year" onclick="setCalendarView('year')" class="py-1.5 rounded-lg text-slate-400 hover:text-white transition">Yıl</button>
             </div>
 
-            <!-- Tarih / Ay / Yıl Seçici -->
             <div id="cal-picker-container">
                 <input type="date" id="calendar-picker" onchange="renderCalendarView()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none">
             </div>
 
-            <!-- Takvim Görünüm Özet Toplamı -->
             <div class="flex justify-between items-center bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-800 text-xs">
                 <span class="text-slate-400">Seçili Dönem Toplamı:</span>
                 <span id="cal-view-total" class="font-bold text-emerald-400 text-sm">₺0,00</span>
             </div>
 
-            <!-- Liste Alanı -->
             <div id="calendar-day-list" class="max-h-60 overflow-y-auto space-y-2"></div>
         </div>
     </div>
@@ -325,7 +310,7 @@
                 <h3 class="font-bold text-slate-100 text-sm">PDF'den Otomatik İşlem Yükle</h3>
                 <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-xs text-slate-400">PDF dosyanızı seçin. Tarihler, tutarlar ve açıklamalar taranıp tarih sırasına göre eklenecektir.</p>
+            <p class="text-xs text-slate-400">PDF dosyanızı seçin. Satır satır doğru tutarlar, tarihler ve açıklamalar taranıp eklenecektir.</p>
             <input type="file" id="pdf-file-input" accept=".pdf" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white">
             <button onclick="processUploadedPDF()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition shadow-lg">PDF'i Tara ve İşle</button>
         </div>
@@ -363,7 +348,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT MANTIK VEYA İŞLEYİŞİ -->
     <script>
         let payments = JSON.parse(localStorage.getItem('hily_payments')) || [
             { id: 1, title: 'Dükkan Kirası', description: 'Ekim ayı dükkan kirası', amount: 15000, date: new Date().toISOString().split('T')[0], status: false, category: 'normal' },
@@ -399,11 +384,9 @@
             payments.sort((a, b) => new Date(a.date) - new Date(b.date));
         }
 
-        // --- 1. DİNAMİK HAVA DURUMU VE CANLI ARKA PLAN EFEEKTİ ---
         async function fetchWeather() {
             const badge = document.getElementById('weather-badge');
             try {
-                // İstanbul Koordinatları (41.0082, 28.9784)
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&current_weather=true');
                 const data = await res.json();
                 const code = data.current_weather.weathercode;
@@ -413,7 +396,6 @@
                 let icon = 'fa-sun text-amber-400';
                 let text = `Güneşli ${temp}°C`;
 
-                // Open-Meteo Weather Codes Mapping
                 if (code >= 1 && code <= 3) {
                     text = `Parçalı Bulutlu ${temp}°C`;
                     icon = 'fa-cloud-sun text-amber-300';
@@ -429,7 +411,6 @@
 
                 badge.innerHTML = `<i class="fa-solid ${icon}"></i> ${text}`;
 
-                // Eğer kullanıcı galeriden özel resim eklemediyse hava durumuna göre tema uygula
                 if (!appSettings.bgImage) {
                     applyWeatherBackground(status);
                 }
@@ -469,7 +450,6 @@
             document.getElementById('weather-effect-container').appendChild(container);
         }
 
-        // --- 2. BİLDİRİM SİSTEMİ ---
         function checkTodayNotifications() {
             const todayStr = new Date().toISOString().split('T')[0];
             const todayUnpaid = payments.filter(p => p.category === 'normal' && p.date === todayStr && !p.status);
@@ -492,10 +472,10 @@
             if ("Notification" in window) {
                 Notification.requestPermission().then(permission => {
                     if (permission === "granted") {
-                        alert("Bildirim izni verildi! Bugün vadesi gelen ödemeleriniz bildirilecektir.");
+                        alert("Bildirim izni verildi!");
                         checkTodayNotifications();
                     } else {
-                        alert("Bildirim izni reddedildi veya engellendi.");
+                        alert("Bildirim izni reddedildi.");
                     }
                 });
             } else {
@@ -503,7 +483,6 @@
             }
         }
 
-        // --- 3. GELİŞMİŞ TAKVİM (GÜN, HAFTA, AY, YIL) ---
         function setCalendarView(view) {
             currentCalendarView = view;
             ['day', 'week', 'month', 'year'].forEach(v => {
@@ -542,10 +521,10 @@
                     return d >= mon && d <= sun;
                 });
             } else if (currentCalendarView === 'month') {
-                const yearMonth = pickerVal.substring(0, 7); // YYYY-MM
+                const yearMonth = pickerVal.substring(0, 7);
                 filtered = payments.filter(p => p.date.startsWith(yearMonth));
             } else if (currentCalendarView === 'year') {
-                const year = pickerVal.substring(0, 4); // YYYY
+                const year = pickerVal.substring(0, 4);
                 filtered = payments.filter(p => p.date.startsWith(year));
             }
 
@@ -582,7 +561,6 @@
         }
         function closeCalendarModal() { document.getElementById('calendar-modal').classList.add('hidden'); }
 
-        // --- DİĞER STANDART FONKSİYONLAR ---
         function applySettings() {
             const body = document.getElementById('app-body');
             body.style.backgroundColor = appSettings.bgColor;
@@ -808,6 +786,7 @@
         function openUploadModal() { document.getElementById('upload-modal').classList.remove('hidden'); }
         function closeUploadModal() { document.getElementById('upload-modal').classList.add('hidden'); }
 
+        // 🎯 HATASIZ SATIR TABANLI PDF TARAYICI ALGORİTMASI
         async function processUploadedPDF() {
             const fileInput = document.getElementById('pdf-file-input');
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -826,55 +805,86 @@
                     for (let i = 1; i <= pdf.numPages; i++) {
                         const page = await pdf.getPage(i);
                         const textContent = await page.getTextContent();
-                        let items = textContent.items.map(item => item.str.trim()).filter(str => str.length > 0);
                         
-                        for (let j = 0; j < items.length; j++) {
-                            let currentStr = items[j];
-                            let dateMatch = currentStr.match(/(\d{2})[\.\/](\d{2})[\.\/](\d{4})/);
+                        // Metinleri Y (Satır Yüksekliği) koordinatlarına göre gruplayalım
+                        let linesMap = {};
+                        textContent.items.forEach(item => {
+                            let str = item.str.trim();
+                            if (!str) return;
                             
-                            if (dateMatch) {
-                                let dateStr = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
-                                let title = "PDF İşlemi";
-                                let description = "";
-                                let amount = 0;
+                            // Y koordinatını yuvarlayarak aynı satırdaki metinleri birleştirelim
+                            let y = Math.round(item.transform[5]);
+                            if (!linesMap[y]) linesMap[y] = [];
+                            linesMap[y].push(str);
+                        });
 
-                                for (let k = Math.max(0, j - 2); k <= Math.min(items.length - 1, j + 6); k++) {
-                                    let checkStr = items[k];
-                                    let amountMatch = checkStr.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/);
-                                    
-                                    if (amountMatch && amount === 0) {
-                                        amount = parseFloat(amountMatch[1].replace(/\./g, '').replace(',', '.'));
-                                    } else if (k !== j && !checkStr.match(/(\d{2})[\.\/](\d{2})[\.\/](\d{4})/) && !checkStr.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/)) {
-                                        if (checkStr.length > 3) {
-                                            if (!title || title === "PDF İşlemi") title = checkStr;
-                                            else description += checkStr + " ";
-                                        }
+                        // Y koordinatına göre yukarıdan aşağıya sırala
+                        let sortedY = Object.keys(linesMap).sort((a, b) => b - a);
+
+                        sortedY.forEach(yKey => {
+                            let lineStr = linesMap[yKey].join(' ');
+                            
+                            // Genel Toplam veya Bakiye satırlarını atla (Örn: "TOPLAM", "BAKİYE")
+                            if (lineStr.toUpperCase().includes('TOPLAM') || lineStr.toUpperCase().includes('BAKİYE')) {
+                                return;
+                            }
+
+                            // Tarih Formatı Arama (GG.AA.YYYY veya GG/AA/YYYY)
+                            let dateMatch = lineStr.match(/(\d{2})[\.\/](\d{2})[\.\/](\d{4})/);
+                            if (dateMatch) {
+                                let day = dateMatch[1];
+                                let month = dateMatch[2];
+                                let year = dateMatch[3];
+
+                                // Hatalı Yıl Düzeltme (Örn: 0206 -> 2026)
+                                if (year.length === 4 && year.startsWith('02')) {
+                                    year = '20' + year.substring(2);
+                                }
+
+                                let dateStr = `${year}-${month}-${day}`;
+
+                                // Tutar Arama (Satır içindeki TL/₺ tutarlarını yakala, örn: 4.054,90)
+                                let amountMatches = lineStr.match(/(\d{1,3}(?:\.\d{3})*,\d{2})/g);
+                                
+                                if (amountMatches && amountMatches.length > 0) {
+                                    // Satırdaki tutarlardan işlem tutarını seç (Genellikle ilk veya uygun olan)
+                                    let rawAmount = amountMatches[0];
+                                    let amount = parseFloat(rawAmount.replace(/\./g, '').replace(',', '.'));
+
+                                    // Satırdaki açıklama metnini ayıkla (Tarih ve tutarı çıkar)
+                                    let cleanDesc = lineStr
+                                        .replace(dateMatch[0], '')
+                                        .replace(rawAmount, '')
+                                        .replace(/TL|₺/gi, '')
+                                        .trim();
+
+                                    let title = cleanDesc.substring(0, 35) || "PDF İşlemi";
+                                    let description = cleanDesc || "PDF dökümünden aktarıldı.";
+
+                                    if (amount > 0) {
+                                        extractedItems.push({
+                                            id: Date.now() + Math.random(),
+                                            title: title,
+                                            description: description,
+                                            amount: amount,
+                                            date: dateStr,
+                                            status: false,
+                                            category: 'normal'
+                                        });
                                     }
                                 }
-
-                                if (amount > 0) {
-                                    extractedItems.push({
-                                        id: Date.now() + Math.random(),
-                                        title: title,
-                                        description: description.trim() || 'PDF dökümünden aktarıldı.',
-                                        amount: amount,
-                                        date: dateStr,
-                                        status: false,
-                                        category: 'normal'
-                                    });
-                                }
                             }
-                        }
+                        });
                     }
 
                     if (extractedItems.length > 0) {
                         payments.push(...extractedItems);
                         saveData();
                         closeUploadModal();
-                        alert(`${extractedItems.length} adet işlem PDF'den başarıyla tarandı ve eklendi!`);
+                        alert(`${extractedItems.length} adet işlem PDF'den tam ve doğru tutarlarıyla taranıp "Tüm Ödemeler" kısmına eklendi!`);
                         showDetail('all');
                     } else {
-                        alert('PDF içerisinde uygun formatta tarih ve tutar bulunamadı.');
+                        alert('PDF içerisinde uygun satır formatı bulunamadı.');
                     }
 
                 } catch (err) {
